@@ -1,6 +1,6 @@
 name: ClickToCommand
 main: littlegruz.clicktocommand.ClickMain
-version: 0.1
+version: 1.0
 commands:
    setclickcommand:
       description: Binds a command to the player when they right click on a player

@@ -82,7 +82,7 @@ public class ClickMain extends JavaPlugin{
       PluginManager pm = this.getServer().getPluginManager();
       pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener, Event.Priority.Normal, this);
       
-      log.info("Click To Command v0.1 is enabled");
+      log.info("Click To Command v1.0 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -111,8 +111,10 @@ public class ClickMain extends JavaPlugin{
             sender.sendMessage("You have no associated command");
       }
       else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
-         if(clickMap.get(sender.getName()) != null)
-            sender.sendMessage("You command in use is: /" + clickMap.get(sender.getName()));
+         if(clickMap.get("GLOBAL") != null)
+            sender.sendMessage("Your command in use is: /" + clickMap.get("GLOBAL"));
+         else if(clickMap.get(sender.getName()) != null)
+            sender.sendMessage("Your command in use is: /" + clickMap.get(sender.getName()));
          else
             sender.sendMessage("You have no associated command");
       }

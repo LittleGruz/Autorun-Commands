@@ -12,19 +12,29 @@ public class ClickPlayerListener extends PlayerListener{
    }
    
    public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
-      //Executes the assigned command if one is set
+      //Executes the assigned command if one is set or a global command is set
       if(event.getRightClicked() instanceof Player){
          Player player = (Player) event.getRightClicked();
-         if(plugin.getClickMap().get(event.getPlayer().getName()) != null){
-            String command;
+         String command;
+         if(plugin.getClickMap().get("GLOBAL") != null){
+            command = plugin.getClickMap().get("GLOBAL").replace("potato", player.getName());
+            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+         }
+         else if(plugin.getClickMap().get(event.getPlayer().getName()) != null){
             command = plugin.getClickMap().get(event.getPlayer().getName()).replace("potato", player.getName());
             plugin.getServer().dispatchCommand(event.getPlayer(), command);
          }
       }
       /*else{
          String command;
-         command = plugin.getClickMap().get(event.getPlayer().getName()).replace("potato", "little_gruz");
-         plugin.getServer().dispatchCommand(event.getPlayer(), command);
+         if(plugin.getClickMap().get("GLOBAL") != null){
+            command = plugin.getClickMap().get("GLOBAL").replace("potato", event.getRightClicked().toString());
+            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+         }
+         else if(plugin.getClickMap().get(event.getPlayer().getName()) != null){
+            command = plugin.getClickMap().get(event.getPlayer().getName()).replace("potato", "Little_Gruz");
+            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+         }
       }*/
    }
 }
