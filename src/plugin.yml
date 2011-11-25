@@ -1,13 +1,16 @@
-name: ClickToCommand
-main: littlegruz.clicktocommand.ClickMain
-version: 1.0
+name: AutorunCommands
+main: littlegruz.autoruncommands.CommandMain
+version: 2.0
 commands:
    setclickcommand:
       description: Binds a command to the player when they right click on a player
-      usage: /setclickcommand <command> [arguments]
+      usage: /setclickcommand <command>
    displayclickcommand:
       description: Shows the command associated with the player
       usage: /displayclickcommand
    removeclickcommand:
-      description: Removes the player from the click list
+      description: Removes the player from the player click list
       usage: /removeclickcommand
+   blockcommand:
+      description: The next block right clicked will be a command block
+      usage: /blockcommand <command>
