@@ -61,7 +61,7 @@ public class CommandMain extends JavaPlugin{
           Iterator<Map.Entry<Location, String>> it = blockCommandMap.entrySet().iterator();
           
           //Save the blocks and corresponding commands
-          bw.write("<Block (world,x,y,z)> <Command>\n");
+          bw.write("<Block Location> <Command>\n");
           while(it.hasNext()){
              Entry<Location, String> mp = it.next();
              bw.write(mp.getKey().getWorld().getUID().toString() + " "
@@ -136,13 +136,11 @@ public class CommandMain extends JavaPlugin{
          Location loc = null;
          
          while((input = br.readLine()) != null){
-            if(input.compareToIgnoreCase("<Block (world,x,y,z)> <Command>") == 0){
+            if(input.compareToIgnoreCase("<Block Location> <Command>") == 0){
                continue;
             }
             st = new StringTokenizer(input, " ");
-            for(int i = 0; i < 4; i++){
-               loc = new Location(getServer().getWorld(UUID.fromString(st.nextToken())), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
-            }
+            loc = new Location(getServer().getWorld(UUID.fromString(st.nextToken())), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
             command = st.nextToken();
             blockCommandMap.put(loc, command);
          }
@@ -179,11 +177,11 @@ public class CommandMain extends JavaPlugin{
          }
          
       }catch(FileNotFoundException e){
-         log.info("No original block command file, creating new one.");
+         log.info("No original command file, creating new one.");
       }catch(IOException e){
-         log.info("Error reading block command file");
+         log.info("Error reading command file");
       }catch(Exception e){
-         log.info("Incorrectly formatted block command file");
+         log.info("Incorrectly formatted command file");
       }
       
       placeBlock = false;
