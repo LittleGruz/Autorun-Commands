@@ -30,7 +30,8 @@ public class CommandPlayerListener extends PlayerListener{
             plugin.getServer().dispatchCommand(event.getPlayer(), command);
          }
       }
-      /*else{
+      /*This code is for quick testing
+       * else{
          String command;
          if(plugin.getClickMap().get("GLOBAL") != null){
             command = plugin.getClickMap().get("GLOBAL").replace("potato", event.getRightClicked().toString());
@@ -50,6 +51,7 @@ public class CommandPlayerListener extends PlayerListener{
          if(event.getMaterial().compareTo(Material.AIR) == 0
                  && event.getAction().compareTo(Action.RIGHT_CLICK_BLOCK) == 0){
             event.getPlayer().sendMessage(plugin.getBlockCommand() + " was sent");
+            plugin.getBlockCommandMap().put(event.getClickedBlock().getLocation(), plugin.getBlockCommand());
             plugin.setPlaceBlock(false);
          }
       }

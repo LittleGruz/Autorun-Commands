@@ -12,6 +12,7 @@ public class CommandBlockListener extends BlockListener {
       plugin = instance;
    }
    
+   //If block was removed, get rid of it from the HashMap
    public void onBlockBreak(BlockBreakEvent event){
       if(plugin.getBlockCommandMap().get(event.getBlock().getLocation()) != null){
          plugin.getBlockCommandMap().remove(event.getBlock().getLocation());

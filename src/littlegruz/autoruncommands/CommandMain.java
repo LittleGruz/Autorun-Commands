@@ -31,9 +31,9 @@ public class CommandMain extends JavaPlugin{
    private final CommandBlockListener blockListener = new CommandBlockListener(this);
    private HashMap<String, String> playerCommandMap;
    private HashMap<Location, String> blockCommandMap;
-   //private HashMap<String, String> commandMap;
+   private HashMap<String, String> commandMap;
    private File playerFile;
-   //private File commandFile;
+   private File commandFile;
    private File blockFile;
    private boolean placeBlock;
    private String blockCommand;
@@ -74,6 +74,22 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving block command file");
        }
+      
+      //Save command data
+      try{
+          BufferedWriter bw = new BufferedWriter(new FileWriter(commandFile));
+          Iterator<Map.Entry<String, String>> it = commandMap.entrySet().iterator();
+          
+          //Save the blocks and corresponding commands
+          bw.write("<Identifing name> <Command>\n");
+          while(it.hasNext()){
+             Entry<String, String> mp = it.next();
+             bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+          }
+          bw.close();
+       }catch(IOException e){
+          log.info("Error saving command file");
+       }
       log.info("Autorun Commands v2.0 is melting! MELTING!");
    }
 
@@ -81,7 +97,7 @@ public class CommandMain extends JavaPlugin{
       //Create the directory and files if needed
       new File(getDataFolder().toString()).mkdir();
       playerFile = new File(getDataFolder().toString() + "/playerList.txt");
-      //commandFile = new File(getDataFolder().toString() + "/commands.txt");
+      commandFile = new File(getDataFolder().toString() + "/commands.txt");
       blockFile = new File(getDataFolder().toString() + "/blockList.txt");
       
       //Load the player file data
@@ -91,18 +107,15 @@ public class CommandMain extends JavaPlugin{
          StringTokenizer st;
          String input;
          String name;
-         String args;
+         String command;
          while((input = br.readLine()) != null){
             if(input.compareToIgnoreCase("<Player> <Command>") == 0){
                continue;
             }
             st = new StringTokenizer(input, " ");
             name = st.nextToken();
-            args = st.nextToken();
-            while(st.hasMoreTokens()){
-               args += " " + st.nextToken();
-            }
-            playerCommandMap.put(name, args);
+            command = st.nextToken();
+            playerCommandMap.put(name, command);
          }
          
       }catch(FileNotFoundException e){
@@ -113,13 +126,13 @@ public class CommandMain extends JavaPlugin{
          log.info("Incorrectly formatted player command file");
       }
       
-      //Load the player file data
+      //Load the block file data
       blockCommandMap = new HashMap<Location, String>();
       try{
          BufferedReader br = new BufferedReader(new FileReader(blockFile));
          StringTokenizer st;
          String input;
-         String args;
+         String command;
          Location loc = null;
          
          while((input = br.readLine()) != null){
@@ -130,11 +143,39 @@ public class CommandMain extends JavaPlugin{
             for(int i = 0; i < 4; i++){
                loc = new Location(getServer().getWorld(UUID.fromString(st.nextToken())), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
             }
+            command = st.nextToken();
+            blockCommandMap.put(loc, command);
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original block command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading block command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted block command file");
+      }
+      
+      //Load the command file data
+      commandMap = new HashMap<String, String>();
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(commandFile));
+         StringTokenizer st;
+         String input;
+         String args;
+         String name;
+         
+         //Assumes that the name is only one token long
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Identifing name> <Command>") == 0){
+               continue;
+            }
+            st = new StringTokenizer(input, " ");
+            name = st.nextToken();
             args = st.nextToken();
             while(st.hasMoreTokens()){
                args += " " + st.nextToken();
             }
-            blockCommandMap.put(loc, args);
+            commandMap.put(name, args);
          }
          
       }catch(FileNotFoundException e){
@@ -192,14 +233,35 @@ public class CommandMain extends JavaPlugin{
       }
       else if(commandLabel.compareToIgnoreCase("blockcommand") == 0){
          if(args.length != 0){
-            placeBlock = true;
-            blockCommand = args[0];
-            for(int i = 1; i < args.length; i++){
-               blockCommand += " " + args[i];
+            if(commandMap.get(args[0]) != null){
+               blockCommand = args[0];
+               placeBlock = true;
+            }
+            else{
+               sender.sendMessage("No command found with that identifier");
+               sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
             }
          }
          else{
-            sender.sendMessage("No command given for block");
+            sender.sendMessage("No autorun command given");
+         }
+      }else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
+         if(args.length > 1){
+            String id;
+            String command;
+            id = args[0];
+            command = args[1];
+            for(int i = 2; i < args.length; i++){
+               command += " " + args[i];
+            }
+            if(commandMap.put(id, command) != null){
+               sender.sendMessage("Overwrote old command");
+            }
+            else
+               sender.sendMessage("Command added");
+         }
+         else{
+            sender.sendMessage("An identifier and command must be given");
          }
       }
       
@@ -210,15 +272,19 @@ public class CommandMain extends JavaPlugin{
       return playerCommandMap;
    }
 
-   public HashMap<Location, String> getBlockCommandMap() {
+   public HashMap<Location, String> getBlockCommandMap(){
       return blockCommandMap;
    }
+
+   public HashMap<String, String> getcommandMap(){
+      return commandMap;
+   }
    
-   public boolean isPlaceBlock() {
+   public boolean isPlaceBlock(){
       return placeBlock;
    }
    
-   public void setPlaceBlock(boolean placeBlock) {
+   public void setPlaceBlock(boolean placeBlock){
       this.placeBlock = placeBlock;
    }
    

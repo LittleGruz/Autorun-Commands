@@ -14,3 +14,6 @@ commands:
    blockcommand:
       description: The next block right clicked will be a command block
       usage: /blockcommand <command>
+   addacommand:
+      description: Add a command to into the map of commands
+      usage: /addacommand <identifier> <command> [args]
