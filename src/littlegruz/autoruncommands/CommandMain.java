@@ -37,6 +37,8 @@ public class CommandMain extends JavaPlugin{
    private File blockFile;
    private boolean placeBlock;
    private String blockCommand;
+   private Location lastBlock;
+   private String lastPlayer;
 
    public void onDisable(){
       //Save player data
@@ -186,11 +188,14 @@ public class CommandMain extends JavaPlugin{
       
       placeBlock = false;
       blockCommand = "";
+      lastBlock = new Location(null,0,0,0);
+      lastPlayer = "";
       
       //Set up the listeners
       PluginManager pm = this.getServer().getPluginManager();
       pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
       
       log.info("Autorun Commands v2.0 is enabled");
@@ -198,17 +203,20 @@ public class CommandMain extends JavaPlugin{
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
       if(commandLabel.compareToIgnoreCase("setclickcommand") == 0){
-         if(args.length >= 1){
+         if(args.length != 0){
             String command;
-            command = args[0];
-            for(int i = 1; i < args.length; i++){
-               command += " " + args[i];
+            if(commandMap.get(args[0]) != null){
+               command = args[0];
+               if(playerCommandMap.get(sender.getName()) != null){
+                  playerCommandMap.remove(sender.getName());
+               }
+               playerCommandMap.put(sender.getName(), command);
+               sender.sendMessage("Command association successful");
             }
-            if(playerCommandMap.get(sender.getName()) != null){
-               playerCommandMap.remove(sender.getName());
+            else{
+               sender.sendMessage("No command found with that identifier");
+               sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
             }
-            playerCommandMap.put(sender.getName(), command);
-            sender.sendMessage("Command association successful");
          }
          else
             sender.sendMessage("Not enough arguments");
@@ -229,11 +237,13 @@ public class CommandMain extends JavaPlugin{
          else
             sender.sendMessage("You have no associated command");
       }
-      else if(commandLabel.compareToIgnoreCase("blockcommand") == 0){
+      else if(commandLabel.compareToIgnoreCase("setcommandblock") == 0){
          if(args.length != 0){
             if(commandMap.get(args[0]) != null){
                blockCommand = args[0];
                placeBlock = true;
+               sender.sendMessage("Right click with your fist to apply \'"
+               + commandMap.get(args[0]) + "\'");
             }
             else{
                sender.sendMessage("No command found with that identifier");
@@ -274,7 +284,7 @@ public class CommandMain extends JavaPlugin{
       return blockCommandMap;
    }
 
-   public HashMap<String, String> getcommandMap(){
+   public HashMap<String, String> getCommandMap(){
       return commandMap;
    }
    
@@ -289,5 +299,20 @@ public class CommandMain extends JavaPlugin{
    public String getBlockCommand(){
       return blockCommand;
    }
+   
+   public Location getLastBlock(){
+      return lastBlock;
+   }
+   
+   public void setLastBlock(Location location){
+      lastBlock = location;
+   }
 
+   public String getLastPlayer() {
+      return lastPlayer;
+   }
+
+   public void setLastPlayer(String lastPlayer) {
+      this.lastPlayer = lastPlayer;
+   }
 }
