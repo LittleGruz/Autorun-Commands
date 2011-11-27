@@ -8,8 +8,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class CommandPlayerListener extends PlayerListener{
    private CommandMain plugin;
@@ -65,14 +67,20 @@ public class CommandPlayerListener extends PlayerListener{
       loc.setY(loc.getY() - 1);
       
       //If the player is above a command block then execute the command
-      //TODO: For this, need to create some way of saving where everyone is
       if(plugin.getBlockCommandMap().get(loc) != null
-            && !loc.equals(plugin.getLastBlock())
-            && event.getPlayer().getName().compareToIgnoreCase(plugin.getLastPlayer()) != 0){
+            && !loc.equals(plugin.getPlayerPosMap().get(event.getPlayer().getName()))){
          String command;
          command = plugin.getBlockCommandMap().get(loc);
+         plugin.getPlayerPosMap().put(event.getPlayer().getName(), loc);
          plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
-         plugin.setLastBlock(loc.clone());
       }
+   }
+   
+   public void onPlayerJoin(PlayerJoinEvent event){
+      plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
+   }
+   
+   public void onPlayerQuit(PlayerQuitEvent event){
+      plugin.getPlayerPosMap().remove(event.getPlayer().getName());
    }
 }

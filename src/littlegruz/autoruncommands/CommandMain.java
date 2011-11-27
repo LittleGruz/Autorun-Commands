@@ -32,13 +32,12 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> playerCommandMap;
    private HashMap<Location, String> blockCommandMap;
    private HashMap<String, String> commandMap;
+   private HashMap<String, Location> playerPosMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
    private boolean placeBlock;
    private String blockCommand;
-   private Location lastBlock;
-   private String lastPlayer;
 
    public void onDisable(){
       //Save player data
@@ -188,14 +187,15 @@ public class CommandMain extends JavaPlugin{
       
       placeBlock = false;
       blockCommand = "";
-      lastBlock = new Location(null,0,0,0);
-      lastPlayer = "";
+      playerPosMap = new HashMap<String, Location>();
       
       //Set up the listeners
       PluginManager pm = this.getServer().getPluginManager();
       pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
       
       log.info("Autorun Commands v2.0 is enabled");
@@ -299,20 +299,8 @@ public class CommandMain extends JavaPlugin{
    public String getBlockCommand(){
       return blockCommand;
    }
-   
-   public Location getLastBlock(){
-      return lastBlock;
-   }
-   
-   public void setLastBlock(Location location){
-      lastBlock = location;
-   }
 
-   public String getLastPlayer() {
-      return lastPlayer;
-   }
-
-   public void setLastPlayer(String lastPlayer) {
-      this.lastPlayer = lastPlayer;
+   public HashMap<String, Location> getPlayerPosMap() {
+      return playerPosMap;
    }
 }
