@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 2.0
+version: 2.1
 commands:
    setclickcommand:
       description: Binds a command to the player when they right click on a player

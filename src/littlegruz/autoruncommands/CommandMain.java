@@ -91,7 +91,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.0 is melting! MELTING!");
+      log.info("Autorun Commands v2.1 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -198,7 +198,7 @@ public class CommandMain extends JavaPlugin{
       pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
       
-      log.info("Autorun Commands v2.0 is enabled");
+      log.info("Autorun Commands v2.1 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){

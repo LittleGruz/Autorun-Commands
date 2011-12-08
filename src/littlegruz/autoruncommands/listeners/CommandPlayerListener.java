@@ -66,13 +66,16 @@ public class CommandPlayerListener extends PlayerListener{
       loc = event.getPlayer().getLocation().getBlock().getLocation();
       loc.setY(loc.getY() - 1);
       
-      //If the player is above a command block then execute the command
-      if(plugin.getBlockCommandMap().get(loc) != null
-            && !loc.equals(plugin.getPlayerPosMap().get(event.getPlayer().getName()))){
-         String command;
-         command = plugin.getBlockCommandMap().get(loc);
-         plugin.getPlayerPosMap().put(event.getPlayer().getName(), loc);
-         plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+      if(!loc.equals(plugin.getPlayerPosMap().get(event.getPlayer().getName()))){
+         //If the player is above a command block then execute the command
+         if(plugin.getBlockCommandMap().get(loc) != null){
+            String command;
+            command = plugin.getBlockCommandMap().get(loc);
+            plugin.getPlayerPosMap().put(event.getPlayer().getName(), loc);
+            plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+         }
+         else
+            plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
       }
    }
    
