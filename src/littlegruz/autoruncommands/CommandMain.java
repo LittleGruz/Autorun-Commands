@@ -91,7 +91,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.1 is melting! MELTING!");
+      log.info("Autorun Commands v2.2 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -198,79 +198,120 @@ public class CommandMain extends JavaPlugin{
       pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
       
-      log.info("Autorun Commands v2.1 is enabled");
+      log.info("Autorun Commands v2.2 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
       if(commandLabel.compareToIgnoreCase("setclickcommand") == 0){
-         if(args.length != 0){
-            String command;
-            if(commandMap.get(args[0]) != null){
-               command = args[0];
-               if(playerCommandMap.get(sender.getName()) != null){
-                  playerCommandMap.remove(sender.getName());
+         if(sender.hasPermission("autoruncommands.setclick")){
+            if(args.length != 0){
+               String command;
+               if(commandMap.get(args[0]) != null){
+                  command = args[0];
+                  if(playerCommandMap.get(sender.getName()) != null){
+                     playerCommandMap.remove(sender.getName());
+                  }
+                  playerCommandMap.put(sender.getName(), command);
+                  sender.sendMessage("Command association successful");
                }
-               playerCommandMap.put(sender.getName(), command);
-               sender.sendMessage("Command association successful");
-            }
-            else{
-               sender.sendMessage("No command found with that identifier");
-               sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-            }
-         }
-         else
-            sender.sendMessage("Not enough arguments");
-      }
-      else if(commandLabel.compareToIgnoreCase("removeclickcommand") == 0){
-         if(playerCommandMap.get(sender.getName()) != null){
-            playerCommandMap.remove(sender.getName());
-            sender.sendMessage("Command removed");
-         }
-         else
-            sender.sendMessage("You have no associated command");
-      }
-      else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
-         if(playerCommandMap.get("GLOBAL") != null)
-            sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL"));
-         else if(playerCommandMap.get(sender.getName()) != null)
-            sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()));
-         else
-            sender.sendMessage("You have no associated command");
-      }
-      else if(commandLabel.compareToIgnoreCase("setcommandblock") == 0){
-         if(args.length != 0){
-            if(commandMap.get(args[0]) != null){
-               blockCommand = args[0];
-               placeBlock = true;
-               sender.sendMessage("Right click with your fist to apply \'"
-               + commandMap.get(args[0]) + "\'");
-            }
-            else{
-               sender.sendMessage("No command found with that identifier");
-               sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-            }
-         }
-         else{
-            sender.sendMessage("No autorun command given");
-         }
-      }else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
-         if(args.length > 1){
-            String id;
-            String command;
-            id = args[0];
-            command = args[1];
-            for(int i = 2; i < args.length; i++){
-               command += " " + args[i];
-            }
-            if(commandMap.put(id, command) != null){
-               sender.sendMessage("Overwrote old command");
+               else if(commandMap.get(args[0] + "[op]") != null){
+                  command = args[0];
+                  if(playerCommandMap.get(sender.getName()) != null){
+                     playerCommandMap.remove(sender.getName());
+                  }
+                  playerCommandMap.put(sender.getName(), command);
+                  sender.sendMessage("OP command association successful");
+               }
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
             }
             else
-               sender.sendMessage("Command added");
+               sender.sendMessage("Not enough arguments");
          }
-         else{
-            sender.sendMessage("An identifier and command must be given");
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("removeclickcommand") == 0){
+         if(sender.hasPermission("autoruncommands.removeclick")){
+            if(playerCommandMap.get(sender.getName()) != null){
+               playerCommandMap.remove(sender.getName());
+               sender.sendMessage("Command removed");
+            }
+            else
+               sender.sendMessage("You have no associated command");
          }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
+         if(sender.hasPermission("autoruncommands.displayclick")){
+            if(playerCommandMap.get("GLOBAL") != null)
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL").replace("[op]", ""));
+            else if(playerCommandMap.get(sender.getName()) != null)
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()).replace("[op]", ""));
+            else
+               sender.sendMessage("You have no associated command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("setcommandblock") == 0){
+         if(sender.hasPermission("autoruncommands.setblock")){
+            if(args.length != 0){
+               if(commandMap.get(args[0]) != null){
+                  blockCommand = args[0];
+                  placeBlock = true;
+                  sender.sendMessage("Right click with your fist to apply \'"
+                  + commandMap.get(args[0]) + "\'");
+               }
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("No autorun command given");
+         }
+      }else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
+         if(sender.hasPermission("autoruncommands.addcommand")){
+            if(args.length > 1){
+               String id;
+               String command;
+               id = args[0];
+               command = args[1];
+               for(int i = 2; i < args.length; i++){
+                  command += " " + args[i];
+               }
+               if(commandMap.put(id, command) != null)
+                  sender.sendMessage("Overwrote old command");
+               else
+                  sender.sendMessage("Command added");
+            }
+            else
+               sender.sendMessage("An identifier and command must be given");
+         }
+      }else if(commandLabel.compareToIgnoreCase("addopcommand") == 0){
+         if(sender.hasPermission("autoruncommands.addopcommand")){
+            if(args.length > 1){
+               String id;
+               String command;
+               id = args[0] + "[op]";
+               command = args[1];
+               for(int i = 2; i < args.length; i++){
+                  command += " " + args[i];
+               }
+               if(commandMap.put(id, command) != null)
+                  sender.sendMessage("Overwrote old op command");
+               else
+                  sender.sendMessage("Op command added");
+            }
+            else
+               sender.sendMessage("An identifier and command must be given");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
       }
       
       return true;

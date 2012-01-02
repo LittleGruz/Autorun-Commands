@@ -72,7 +72,10 @@ public class CommandPlayerListener extends PlayerListener{
             String command;
             command = plugin.getBlockCommandMap().get(loc);
             plugin.getPlayerPosMap().put(event.getPlayer().getName(), loc);
-            plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+            if(command.contains("[op]"))
+               plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+            else
+               plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
          }
          else
             plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);

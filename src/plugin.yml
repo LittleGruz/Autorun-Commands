@@ -17,3 +17,13 @@ commands:
    addacommand:
       description: Add a command to into the map of commands
       usage: /addacommand <identifier> <command> [args]
+   addopcommand:
+      description: Add an op command to into the map of commands
+      usage: /addacommand <identifier> <command> [args]
+permissions:
+   autoruncommands.*:
+      description: All the AutorunCommand commands
+      default: op
+   autoruncommands.displayclick:
+      description: Shows the command associated with the player
+      default: true
