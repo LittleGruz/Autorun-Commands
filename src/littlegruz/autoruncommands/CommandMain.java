@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import littlegruz.autoruncommands.listeners.CommandBlockListener;
+import littlegruz.autoruncommands.listeners.CommandEntityListener;
 import littlegruz.autoruncommands.listeners.CommandPlayerListener;
 //import littlegruz.autoruncommands.listeners.CommandServerListener;
 

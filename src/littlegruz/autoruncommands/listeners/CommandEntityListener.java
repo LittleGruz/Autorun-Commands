@@ -1,4 +1,6 @@
-package littlegruz.autoruncommands;
+package littlegruz.autoruncommands.listeners;
+
+import littlegruz.autoruncommands.CommandMain;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
