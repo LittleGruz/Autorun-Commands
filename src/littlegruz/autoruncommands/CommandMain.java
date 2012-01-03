@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import littlegruz.autoruncommands.listeners.CommandBlockListener;
 import littlegruz.autoruncommands.listeners.CommandEntityListener;
 import littlegruz.autoruncommands.listeners.CommandPlayerListener;
-//import littlegruz.autoruncommands.listeners.CommandServerListener;
+import littlegruz.autoruncommands.listeners.CommandServerListener;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -32,7 +32,7 @@ public class CommandMain extends JavaPlugin{
    private final CommandPlayerListener playerListener = new CommandPlayerListener(this);
    private final CommandBlockListener blockListener = new CommandBlockListener(this);
    private final CommandEntityListener entityListener = new CommandEntityListener(this);
-   //private final CommandServerListener serverListener = new CommandServerListener(this);
+   private final CommandServerListener serverListener = new CommandServerListener(this);
    private HashMap<String, String> playerCommandMap;
    private HashMap<Location, String> blockCommandMap;
    private HashMap<String, String> commandMap;
@@ -42,8 +42,11 @@ public class CommandMain extends JavaPlugin{
    private File commandFile;
    private File blockFile;
    private File deathFile;
+   private File startupFile;
    private boolean placeBlock;
+   private boolean startupDone;
    private String blockCommand;
+   private String startupCommands;
 
    public void onDisable(){
       //Save player data
@@ -82,7 +85,7 @@ public class CommandMain extends JavaPlugin{
           log.info("Error saving block command file");
        }
       
-      //Save player death data
+    //Save player death data
       try{
          BufferedWriter bw = new BufferedWriter(new FileWriter(deathFile));
          Iterator<Map.Entry<String, String>> it = deathCommandMap.entrySet().iterator();
@@ -91,11 +94,24 @@ public class CommandMain extends JavaPlugin{
          bw.write("<Player> <Command>\n");
          while(it.hasNext()){
             Entry<String, String> mp = it.next();
-            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+            bw.write(mp.getKey() + " eath" + mp.getValue() + "\n");
          }
          bw.close();
       }catch(IOException e){
          log.info("Error saving player death command file");
+      }
+      
+      //Save server start up data
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(startupFile));
+         StringTokenizer st = new StringTokenizer(startupCommands, ":");
+         
+         while(st.countTokens() > 0){
+            bw.write(st.nextToken() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving server start up command file");
       }
       
       //Save command data
@@ -113,7 +129,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.2 is melting! MELTING!");
+      log.info("Autorun Commands v2.3 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -123,6 +139,7 @@ public class CommandMain extends JavaPlugin{
       commandFile = new File(getDataFolder().toString() + "/commands.txt");
       blockFile = new File(getDataFolder().toString() + "/blockList.txt");
       deathFile = new File(getDataFolder().toString() + "/deathList.txt");
+      startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -203,6 +220,26 @@ public class CommandMain extends JavaPlugin{
          log.info("Incorrectly formatted player death command file");
       }
       
+      //Load the start up data
+      startupCommands = "";
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(startupFile));
+         String input;
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Command>") == 0){
+               continue;
+            }
+            startupCommands += ":" + input;
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original start up command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading start up command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted start up command file");
+      }
+      
       //Load the command file data
       commandMap = new HashMap<String, String>();
       try{
@@ -235,6 +272,7 @@ public class CommandMain extends JavaPlugin{
       }
       
       placeBlock = false;
+      startupDone = false;
       blockCommand = "";
       playerPosMap = new HashMap<String, Location>();
       
@@ -247,11 +285,9 @@ public class CommandMain extends JavaPlugin{
       pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
-      /*pm.registerEvent(Event.Type.MAP_INITIALIZE, serverListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.SERVER_LIST_PING, serverListener, Event.Priority.Normal, this);*/
       
-      log.info("Autorun Commands v2.2 is enabled");
+      log.info("Autorun Commands v2.3 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -293,12 +329,38 @@ public class CommandMain extends JavaPlugin{
       }
       else if(commandLabel.compareToIgnoreCase("removeclickcommand") == 0){
          if(sender.hasPermission("autoruncommands.removeclick")){
-            if(playerCommandMap.get(sender.getName()) != null){
-               playerCommandMap.remove(sender.getName());
+            String associate;
+            
+            if(args.length == 1)
+               associate = args[0];
+            else
+               associate = sender.getName();
+            
+            if(playerCommandMap.get(associate) != null){
+               playerCommandMap.remove(associate);
                sender.sendMessage("Command removed");
             }
             else
-               sender.sendMessage("You have no associated command");
+               sender.sendMessage(associate + " has no associated command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("removedeathcommand") == 0){
+         if(sender.hasPermission("autoruncommands.removedeath")){
+            String associate;
+            
+            if(args.length == 1)
+               associate = args[0];
+            else
+               associate = sender.getName();
+            
+            if(deathCommandMap.get(associate) != null){
+               deathCommandMap.remove(associate);
+               sender.sendMessage("Command removed");
+            }
+            else
+               sender.sendMessage(associate + " has no associated death command");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
@@ -306,9 +368,9 @@ public class CommandMain extends JavaPlugin{
       else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
          if(sender.hasPermission("autoruncommands.displayclick")){
             if(playerCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL"));
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL").replace("[op]", ""));
             else if(playerCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()));
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()).replace("[op]", ""));
             else
                sender.sendMessage("You have no associated command");
          }
@@ -318,9 +380,23 @@ public class CommandMain extends JavaPlugin{
       else if(commandLabel.compareToIgnoreCase("displaydeathcommand") == 0){
          if(sender.hasPermission("autoruncommands.displaydeath")){
             if(deathCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get("GLOBAL"));
+               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get("GLOBAL").replace("[op]", ""));
             else if(deathCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get(sender.getName()));
+               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get(sender.getName().replace("[op]", "")));
+            else
+               sender.sendMessage("You have no associated death command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("displaystartupcommands") == 0){
+         if(sender.hasPermission("autoruncommands.displaydeath")){
+            if(!startupCommands.isEmpty()){
+               sender.sendMessage("The commands that run on start up are:");
+               StringTokenizer st = new StringTokenizer(startupCommands, ":");
+               while(st.countTokens() > 0)
+                  sender.sendMessage(st.nextToken().replace("[op]", ""));
+            }
             else
                sender.sendMessage("You have no associated death command");
          }
@@ -418,8 +494,68 @@ public class CommandMain extends JavaPlugin{
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
+      else if(commandLabel.compareToIgnoreCase("addstartupcommand") == 0){
+         if(sender.hasPermission("autoruncommands.addstartup")){
+            if(args.length != 0){
+               String command = args[0];
+               
+               if(commandMap.get(command) != null)
+                  addStartupCommand(sender, command);
+               else if(commandMap.get(command + "[op]") != null)
+                  addStartupCommand(sender, command);
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("Not enough arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("removestartupcommand") == 0){
+         if(sender.hasPermission("autoruncommands.removestartup")){
+            if(args.length != 0){
+               String command = args[0];
+               
+               if(commandMap.get(command) != null)
+                  removeStartupCommand(sender, command);
+               else if(commandMap.get(command + "[op]") != null)
+                  removeStartupCommand(sender, command + "[op]");
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("Not enough arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
       
       return true;
+   }
+   
+   public void removeStartupCommand(CommandSender sender, String command){
+      if(startupCommands.contains(":" + command)){
+         startupCommands = startupCommands.replace(":" + command, "");
+         sender.sendMessage("Command removal successful");
+      }
+      else{
+         sender.sendMessage("No command set with that identifier");
+         sender.sendMessage("Check with \'/displaystartupcommands' first");
+      }
+   }
+   
+   public void addStartupCommand(CommandSender sender, String command){
+      if(startupCommands.contains(command))
+         sender.sendMessage("That command is already present");
+      else{
+         startupCommands += ":" + command;
+         sender.sendMessage("Command association successful");
+      }
    }
 
    public HashMap<String, String> getPlayerClickMap(){
@@ -452,5 +588,17 @@ public class CommandMain extends JavaPlugin{
 
    public HashMap<String, Location> getPlayerPosMap() {
       return playerPosMap;
+   }
+
+   public String getStartupCommands() {
+      return startupCommands;
+   }
+
+   public boolean isStartupDone() {
+      return startupDone;
+   }
+
+   public void setStartupDone(boolean startupDone) {
+      this.startupDone = startupDone;
    }
 }

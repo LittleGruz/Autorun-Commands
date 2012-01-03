@@ -1,10 +1,10 @@
 package littlegruz.autoruncommands.listeners;
 
+import java.util.StringTokenizer;
+
 import littlegruz.autoruncommands.CommandMain;
 
-import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.server.ServerListener;
 
 public class CommandServerListener extends ServerListener {
@@ -13,16 +13,18 @@ public class CommandServerListener extends ServerListener {
    public CommandServerListener(CommandMain instance){
       plugin = instance;
    }
-
-   public void onServerListPing(ServerListPingEvent event){
-      plugin.getServer().broadcastMessage("Pinged");
-   }
-   
-   public void onMapInitialize(MapInitializeEvent event){
-      plugin.getServer().broadcastMessage("Init");
-   }
    
    public void onPluginEnable(PluginEnableEvent event){
-      plugin.getServer().broadcastMessage("Plugin enable");
+      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+      public void run() {
+         StringTokenizer st = new StringTokenizer(plugin.getStartupCommands(), ":");
+         if(!plugin.isStartupDone()){
+            while(st.countTokens() > 0)
+               plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(st.nextToken()));
+            plugin.setStartupDone(true);
+         }
+      }
+  }, 20L);
    }
 }

@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 2.2
+version: 2.3
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -13,7 +13,7 @@ commands:
       usage: /displaydeathcommand
    removeclickcommand:
       description: Removes the player from the player click list
-      usage: /removeclickcommand
+      usage: /removeclickcommand [player_name]
    setcommandblock:
       description: The next block right clicked will be a command block
       usage: /setcommandblock <identifier>
@@ -26,6 +26,18 @@ commands:
    setdeathcommand:
       description: Binds a command to the player for when they die
       usage: /setdeathcommand <identifier> [player_name]
+   removedeathcommand:
+      description: Removes a command from the player for when they die
+      usage: /removedeathcommand [player_name]
+   addstartupcommand:
+      description: Add a command to run at server start up
+      usage: /addstartupcommand <identifier>
+   removestartupcommand:
+      description: Remove a command from running at server start up
+      usage: /removestartupcommand <identifier>
+   displaystartupcommands:
+      description: Display the commands that run at server start up
+      usage: /displaystartupcommands
 permissions:
    autoruncommands.*:
       description: All the AutorunCommand commands
