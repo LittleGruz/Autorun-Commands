@@ -31,7 +31,10 @@ public class CommandPlayerListener extends PlayerListener{
          }
          else if(plugin.getPlayerClickMap().get(event.getPlayer().getName()) != null){
             command = plugin.getCommandMap().get(plugin.getPlayerClickMap().get(event.getPlayer().getName())).replace("potato", player.getName());
-            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+            if(command.contains("[op]"))
+               plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+            else
+               plugin.getServer().dispatchCommand(event.getPlayer(), command);
          }
       }
       /*This code is for quick testing
@@ -42,8 +45,11 @@ public class CommandPlayerListener extends PlayerListener{
             plugin.getServer().dispatchCommand(event.getPlayer(), command);
          }
          else if(plugin.getPlayerClickMap().get(event.getPlayer().getName()) != null){
-            command = plugin.getCommandMap().get(plugin.getPlayerClickMap().get(event.getPlayer().getName())).replace("potato", "Little_Gruz");
-            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+            command = plugin.getCommandMap().get(plugin.getPlayerClickMap().get("Little_Gruz")).replace("potato", "Little_Gruz");
+            if(command.contains("[op]"))
+               plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+            else
+               plugin.getServer().dispatchCommand(event.getPlayer(), command);
          }
       }*/
    }

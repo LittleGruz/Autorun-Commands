@@ -3,11 +3,14 @@ main: littlegruz.autoruncommands.CommandMain
 version: 2.1
 commands:
    setclickcommand:
-      description: Binds a command to the player when they right click on a player
-      usage: /setclickcommand <identifier>
+      description: Binds a command to the player for when they right click on a player
+      usage: /setclickcommand <identifier> [player_name]
    displayclickcommand:
       description: Shows the command associated with the player
       usage: /displayclickcommand
+   displaydeathcommand:
+      description: Shows the command associated with the player upon death
+      usage: /displaydeathcommand
    removeclickcommand:
       description: Removes the player from the player click list
       usage: /removeclickcommand
@@ -20,10 +23,16 @@ commands:
    addopcommand:
       description: Add an op command to into the map of commands
       usage: /addacommand <identifier> <command> [args]
+   setdeathcommand:
+      description: Binds a command to the player for when they die
+      usage: /setdeathcommand <identifier> [player_name]
 permissions:
    autoruncommands.*:
       description: All the AutorunCommand commands
       default: op
    autoruncommands.displayclick:
       description: Shows the command associated with the player
+      default: true
+   autoruncommands.displaydeath:
+      description: Shows the command associated with the player upon death
       default: true

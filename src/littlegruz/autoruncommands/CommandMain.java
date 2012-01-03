@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import littlegruz.autoruncommands.listeners.CommandBlockListener;
 import littlegruz.autoruncommands.listeners.CommandPlayerListener;
+//import littlegruz.autoruncommands.listeners.CommandServerListener;
 
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -29,13 +30,17 @@ public class CommandMain extends JavaPlugin{
    Logger log = Logger.getLogger("This is MINECRAFT!");
    private final CommandPlayerListener playerListener = new CommandPlayerListener(this);
    private final CommandBlockListener blockListener = new CommandBlockListener(this);
+   private final CommandEntityListener entityListener = new CommandEntityListener(this);
+   //private final CommandServerListener serverListener = new CommandServerListener(this);
    private HashMap<String, String> playerCommandMap;
    private HashMap<Location, String> blockCommandMap;
    private HashMap<String, String> commandMap;
    private HashMap<String, Location> playerPosMap;
+   private HashMap<String, String> deathCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
+   private File deathFile;
    private boolean placeBlock;
    private String blockCommand;
 
@@ -76,6 +81,22 @@ public class CommandMain extends JavaPlugin{
           log.info("Error saving block command file");
        }
       
+      //Save player death data
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(deathFile));
+         Iterator<Map.Entry<String, String>> it = deathCommandMap.entrySet().iterator();
+         
+         //Save the players and corresponding commands
+         bw.write("<Player> <Command>\n");
+         while(it.hasNext()){
+            Entry<String, String> mp = it.next();
+            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving player death command file");
+      }
+      
       //Save command data
       try{
           BufferedWriter bw = new BufferedWriter(new FileWriter(commandFile));
@@ -100,6 +121,7 @@ public class CommandMain extends JavaPlugin{
       playerFile = new File(getDataFolder().toString() + "/playerList.txt");
       commandFile = new File(getDataFolder().toString() + "/commands.txt");
       blockFile = new File(getDataFolder().toString() + "/blockList.txt");
+      deathFile = new File(getDataFolder().toString() + "/deathList.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -154,6 +176,32 @@ public class CommandMain extends JavaPlugin{
          log.info("Incorrectly formatted block command file");
       }
       
+      //Load the player death file data
+      deathCommandMap = new HashMap<String, String>();
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(deathFile));
+         StringTokenizer st;
+         String input;
+         String name;
+         String command;
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Player> <Command>") == 0){
+               continue;
+            }
+            st = new StringTokenizer(input, " ");
+            name = st.nextToken();
+            command = st.nextToken();
+            deathCommandMap.put(name, command);
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original player death command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading player death command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted player death command file");
+      }
+      
       //Load the command file data
       commandMap = new HashMap<String, String>();
       try{
@@ -196,7 +244,11 @@ public class CommandMain extends JavaPlugin{
       pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
+      /*pm.registerEvent(Event.Type.MAP_INITIALIZE, serverListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Event.Priority.Normal, this);
+      pm.registerEvent(Event.Type.SERVER_LIST_PING, serverListener, Event.Priority.Normal, this);*/
       
       log.info("Autorun Commands v2.2 is enabled");
    }
@@ -205,21 +257,26 @@ public class CommandMain extends JavaPlugin{
       if(commandLabel.compareToIgnoreCase("setclickcommand") == 0){
          if(sender.hasPermission("autoruncommands.setclick")){
             if(args.length != 0){
-               String command;
-               if(commandMap.get(args[0]) != null){
-                  command = args[0];
-                  if(playerCommandMap.get(sender.getName()) != null){
-                     playerCommandMap.remove(sender.getName());
+               String command = args[0];
+               String associate;
+               
+               if(args.length == 2)
+                  associate = args[1];
+               else
+                  associate = sender.getName();
+               
+               if(commandMap.get(command) != null){
+                  if(playerCommandMap.get(associate) != null){
+                     playerCommandMap.remove(associate);
                   }
-                  playerCommandMap.put(sender.getName(), command);
+                  playerCommandMap.put(associate, command);
                   sender.sendMessage("Command association successful");
                }
-               else if(commandMap.get(args[0] + "[op]") != null){
-                  command = args[0];
-                  if(playerCommandMap.get(sender.getName()) != null){
-                     playerCommandMap.remove(sender.getName());
+               else if(commandMap.get(command + "[op]") != null){
+                  if(playerCommandMap.get(associate) != null){
+                     playerCommandMap.remove(associate);
                   }
-                  playerCommandMap.put(sender.getName(), command);
+                  playerCommandMap.put(associate, command + "[op]");
                   sender.sendMessage("OP command association successful");
                }
                else{
@@ -248,11 +305,23 @@ public class CommandMain extends JavaPlugin{
       else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
          if(sender.hasPermission("autoruncommands.displayclick")){
             if(playerCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL").replace("[op]", ""));
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL"));
             else if(playerCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()).replace("[op]", ""));
+               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()));
             else
                sender.sendMessage("You have no associated command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("displaydeathcommand") == 0){
+         if(sender.hasPermission("autoruncommands.displaydeath")){
+            if(deathCommandMap.get("GLOBAL") != null)
+               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get("GLOBAL"));
+            else if(deathCommandMap.get(sender.getName()) != null)
+               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get(sender.getName()));
+            else
+               sender.sendMessage("You have no associated death command");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
@@ -312,6 +381,41 @@ public class CommandMain extends JavaPlugin{
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
+      }if(commandLabel.compareToIgnoreCase("setdeathcommand") == 0){
+         if(sender.hasPermission("autoruncommands.setdeath")){
+            if(args.length != 0){
+               String command = args[0];
+               String associate;
+               
+               if(args.length == 2)
+                  associate = args[1];
+               else
+                  associate = sender.getName();
+               
+               if(commandMap.get(command) != null){
+                  if(deathCommandMap.get(associate) != null){
+                     deathCommandMap.remove(associate);
+                  }
+                  deathCommandMap.put(associate, command);
+                  sender.sendMessage("Command association successful");
+               }
+               else if(commandMap.get(command + "[op]") != null){
+                  if(deathCommandMap.get(associate) != null){
+                     deathCommandMap.remove(associate);
+                  }
+                  deathCommandMap.put(associate, command + "[op]");
+                  sender.sendMessage("OP command association successful");
+               }
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("Not enough arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
       }
       
       return true;
@@ -319,6 +423,10 @@ public class CommandMain extends JavaPlugin{
 
    public HashMap<String, String> getPlayerClickMap(){
       return playerCommandMap;
+   }
+
+   public HashMap<String, String> getPlayerDeathMap(){
+      return deathCommandMap;
    }
 
    public HashMap<Location, String> getBlockCommandMap(){
