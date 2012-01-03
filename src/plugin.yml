@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 2.1
+version: 2.2
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -22,7 +22,7 @@ commands:
       usage: /addacommand <identifier> <command> [args]
    addopcommand:
       description: Add an op command to into the map of commands
-      usage: /addacommand <identifier> <command> [args]
+      usage: /addopcommand <identifier> <command> [args]
    setdeathcommand:
       description: Binds a command to the player for when they die
       usage: /setdeathcommand <identifier> [player_name]
