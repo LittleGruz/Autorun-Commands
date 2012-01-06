@@ -398,7 +398,7 @@ public class CommandMain extends JavaPlugin{
                   sender.sendMessage(st.nextToken().replace("[op]", ""));
             }
             else
-               sender.sendMessage("You have no associated death command");
+               sender.sendMessage("You have no commands set to run at start up");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
