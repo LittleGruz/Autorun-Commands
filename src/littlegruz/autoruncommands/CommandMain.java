@@ -129,7 +129,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.3 is melting! MELTING!");
+      log.info("Autorun Commands v2.4 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -287,7 +287,7 @@ public class CommandMain extends JavaPlugin{
       pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
       pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Event.Priority.Normal, this);
       
-      log.info("Autorun Commands v2.3 is enabled");
+      log.info("Autorun Commands v2.4 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -412,6 +412,12 @@ public class CommandMain extends JavaPlugin{
                   sender.sendMessage("Right click with your fist to apply \'"
                   + commandMap.get(args[0]) + "\'");
                }
+               else if(commandMap.get(args[0] + "[op]") != null){
+                  blockCommand = args[0] + "[op]";
+                  placeBlock = true;
+                  sender.sendMessage("Right click with your fist to apply the OP command \'"
+                  + commandMap.get(args[0] + "[op]").replace("[op]", "") + "\'");
+               }
                else{
                   sender.sendMessage("No command found with that identifier");
                   sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
@@ -420,7 +426,8 @@ public class CommandMain extends JavaPlugin{
             else
                sender.sendMessage("No autorun command given");
          }
-      }else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
+      }
+      else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
          if(sender.hasPermission("autoruncommands.addcommand")){
             if(args.length > 1){
                String id;
@@ -438,7 +445,8 @@ public class CommandMain extends JavaPlugin{
             else
                sender.sendMessage("An identifier and command must be given");
          }
-      }else if(commandLabel.compareToIgnoreCase("addopcommand") == 0){
+      }
+      else if(commandLabel.compareToIgnoreCase("addopcommand") == 0){
          if(sender.hasPermission("autoruncommands.addopcommand")){
             if(args.length > 1){
                String id;
