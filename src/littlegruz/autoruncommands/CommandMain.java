@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class CommandMain extends JavaPlugin{
          bw.write("<Player> <Command>\n");
          while(it.hasNext()){
             Entry<String, String> mp = it.next();
-            bw.write(mp.getKey() + " eath" + mp.getValue() + "\n");
+            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
          }
          bw.close();
       }catch(IOException e){
@@ -463,6 +464,58 @@ public class CommandMain extends JavaPlugin{
             }
             else
                sender.sendMessage("An identifier and command must be given");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("removeacommand") == 0){
+         if(sender.hasPermission("autoruncommands.removecommand")){
+            if(args.length == 1){
+               if(commandMap.remove(args[0]) != null){
+                  ArrayList<String> names = new ArrayList<String>();
+                  // Remove the command where it is associated with players
+                  Iterator<Map.Entry<String, String>> it1 = playerCommandMap.entrySet().iterator();
+                  while(it1.hasNext()){
+                     Entry<String, String> mp1 = it1.next();
+                     if(mp1.getValue().compareTo(args[0]) == 0)
+                        names.add(mp1.getKey());
+                  }
+                  for(int i = 0; i < names.size(); i++)
+                     playerCommandMap.remove(names.get(i));
+                  names.clear();
+   
+                  // Remove the command where it is associated with blocks
+                  ArrayList<Location> places = new ArrayList<Location>();
+                  Iterator<Map.Entry<Location, String>> it2 = blockCommandMap.entrySet().iterator();
+                  while(it2.hasNext()){
+                     Entry<Location, String> mp2 = it2.next();
+                     if(mp2.getValue().compareTo(args[0]) == 0)
+                        places.add(mp2.getKey());
+                  }
+                  for(int i = 0; i < places.size(); i++)
+                     blockCommandMap.remove(places.get(i));
+                  places.clear();
+                  
+                  // Remove the command where it is associated with the death of players
+                  it1 = deathCommandMap.entrySet().iterator();
+                  while(it1.hasNext()){
+                     Entry<String, String> mp1 = it1.next();
+                     if(mp1.getValue().compareTo(args[0]) == 0)
+                        names.add(mp1.getKey());
+                  }
+                  for(int i = 0; i < names.size(); i++)
+                     deathCommandMap.remove(names.get(i));
+                  names.clear();
+                  names.trimToSize();
+                  
+                  startupCommands = startupCommands.replace(":" + args[0], "");
+                  sender.sendMessage("Command removed");
+               }
+               else
+                  sender.sendMessage("No command was found with that identifer");
+            }
+            else
+               sender.sendMessage("You forgot to add the identifier to remove");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
