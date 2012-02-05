@@ -4,16 +4,18 @@ import java.util.StringTokenizer;
 
 import littlegruz.autoruncommands.CommandMain;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 
-public class CommandServerListener extends ServerListener {
+public class CommandServerListener implements Listener {
    private CommandMain plugin;
    
    public CommandServerListener(CommandMain instance){
       plugin = instance;
    }
    
+   @EventHandler
    public void onPluginEnable(PluginEnableEvent event){
       plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 

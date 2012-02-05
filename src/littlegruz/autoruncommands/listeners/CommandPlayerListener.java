@@ -5,21 +5,23 @@ import littlegruz.autoruncommands.CommandMain;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class CommandPlayerListener extends PlayerListener{
+public class CommandPlayerListener implements Listener{
    private CommandMain plugin;
    
    public CommandPlayerListener(CommandMain instance){
       plugin = instance;
    }
    
+   @EventHandler
    public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
       //Executes the assigned command if one is set or a global command is set
       if(event.getRightClicked() instanceof Player){
@@ -54,6 +56,7 @@ public class CommandPlayerListener extends PlayerListener{
       }*/
    }
    
+   @EventHandler
    public void onPlayerInteract(PlayerInteractEvent event){
       //Check if the block should have a command associated
       if(plugin.isPlaceBlock()){
@@ -67,6 +70,7 @@ public class CommandPlayerListener extends PlayerListener{
       }
    }
    
+   @EventHandler
    public void onPlayerMove(PlayerMoveEvent event){
       Location loc;
       loc = event.getPlayer().getLocation().getBlock().getLocation();
@@ -88,10 +92,12 @@ public class CommandPlayerListener extends PlayerListener{
       }
    }
    
+   @EventHandler
    public void onPlayerJoin(PlayerJoinEvent event){
       plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
    }
    
+   @EventHandler
    public void onPlayerQuit(PlayerQuitEvent event){
       plugin.getPlayerPosMap().remove(event.getPlayer().getName());
    }

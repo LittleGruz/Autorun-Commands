@@ -24,16 +24,10 @@ import littlegruz.autoruncommands.listeners.CommandServerListener;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CommandMain extends JavaPlugin{
    Logger log = Logger.getLogger("This is MINECRAFT!");
-   private final CommandPlayerListener playerListener = new CommandPlayerListener(this);
-   private final CommandBlockListener blockListener = new CommandBlockListener(this);
-   private final CommandEntityListener entityListener = new CommandEntityListener(this);
-   private final CommandServerListener serverListener = new CommandServerListener(this);
    private HashMap<String, String> playerCommandMap;
    private HashMap<Location, String> blockCommandMap;
    private HashMap<String, String> commandMap;
@@ -130,7 +124,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.4 is melting! MELTING!");
+      log.info("Autorun Commands v2.4.1 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -278,17 +272,12 @@ public class CommandMain extends JavaPlugin{
       playerPosMap = new HashMap<String, Location>();
       
       //Set up the listeners
-      PluginManager pm = this.getServer().getPluginManager();
-      pm.registerEvent(Event.Type.PLAYER_INTERACT_ENTITY, playerListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Event.Priority.Normal, this);
-      pm.registerEvent(Event.Type.PLUGIN_ENABLE, serverListener, Event.Priority.Normal, this);
+      getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
+      getServer().getPluginManager().registerEvents(new CommandBlockListener(this), this);
+      getServer().getPluginManager().registerEvents(new CommandEntityListener(this), this);
+      getServer().getPluginManager().registerEvents(new CommandServerListener(this), this);
       
-      log.info("Autorun Commands v2.4 is enabled");
+      log.info("Autorun Commands v2.4.1 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
