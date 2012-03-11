@@ -19,11 +19,11 @@ public class CommandEntityListener implements Listener {
       if(event.getEntity() instanceof Player){
          Player playa =  (Player)event.getEntity();
          String command;
-         if(plugin.getPlayerClickMap().get("GLOBAL") != null){
+         if(plugin.getPlayerDeathMap().get("GLOBAL") != null){
             command = plugin.getCommandMap().get(plugin.getPlayerDeathMap().get("GLOBAL")).replace("potato", playa.getName());
             plugin.getServer().dispatchCommand(playa, command);
          }
-         else if(plugin.getPlayerClickMap().get(playa.getName()) != null){
+         else if(plugin.getPlayerDeathMap().get(playa.getName()) != null){
             command = plugin.getCommandMap().get(plugin.getPlayerDeathMap().get(playa.getName())).replace("potato", playa.getName());
             if(command.contains("[op]"))
                plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);

@@ -33,10 +33,12 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> commandMap;
    private HashMap<String, Location> playerPosMap;
    private HashMap<String, String> deathCommandMap;
+   private HashMap<String, String> respawnCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
    private File deathFile;
+   private File respawnFile;
    private File startupFile;
    private boolean placeBlock;
    private boolean startupDone;
@@ -80,7 +82,7 @@ public class CommandMain extends JavaPlugin{
           log.info("Error saving block command file");
        }
       
-    //Save player death data
+      //Save player death data
       try{
          BufferedWriter bw = new BufferedWriter(new FileWriter(deathFile));
          Iterator<Map.Entry<String, String>> it = deathCommandMap.entrySet().iterator();
@@ -94,6 +96,22 @@ public class CommandMain extends JavaPlugin{
          bw.close();
       }catch(IOException e){
          log.info("Error saving player death command file");
+      }
+      
+      //Save player respawn data
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(respawnFile));
+         Iterator<Map.Entry<String, String>> it = respawnCommandMap.entrySet().iterator();
+         
+         //Save the players and corresponding commands
+         bw.write("<Player> <Command>\n");
+         while(it.hasNext()){
+            Entry<String, String> mp = it.next();
+            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving player respawn command file");
       }
       
       //Save server start up data
@@ -134,6 +152,7 @@ public class CommandMain extends JavaPlugin{
       commandFile = new File(getDataFolder().toString() + "/commands.txt");
       blockFile = new File(getDataFolder().toString() + "/blockList.txt");
       deathFile = new File(getDataFolder().toString() + "/deathList.txt");
+      respawnFile = new File(getDataFolder().toString() + "/respawnList.txt");
       startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
       
       //Load the player file data
@@ -213,6 +232,32 @@ public class CommandMain extends JavaPlugin{
          log.info("Error reading player death command file");
       }catch(Exception e){
          log.info("Incorrectly formatted player death command file");
+      }
+      
+      //Load the player respawn file data
+      respawnCommandMap = new HashMap<String, String>();
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(respawnFile));
+         StringTokenizer st;
+         String input;
+         String name;
+         String command;
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Player> <Command>") == 0){
+               continue;
+            }
+            st = new StringTokenizer(input, " ");
+            name = st.nextToken();
+            command = st.nextToken();
+            respawnCommandMap.put(name, command);
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original player respawn command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading player respawn command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted player respawn command file");
       }
       
       //Load the start up data
@@ -355,12 +400,31 @@ public class CommandMain extends JavaPlugin{
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
+      else if(commandLabel.compareToIgnoreCase("removerespawncommand") == 0){
+         if(sender.hasPermission("autoruncommands.removerespawn")){
+            String associate;
+            
+            if(args.length == 1)
+               associate = args[0];
+            else
+               associate = sender.getName();
+            
+            if(respawnCommandMap.get(associate) != null){
+               respawnCommandMap.remove(associate);
+               sender.sendMessage("Command removed");
+            }
+            else
+               sender.sendMessage(associate + " has no associated respawn command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
       else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
          if(sender.hasPermission("autoruncommands.displayclick")){
             if(playerCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get("GLOBAL").replace("[op]", ""));
+               sender.sendMessage("Your command in use is: /" + commandMap.get(playerCommandMap.get("GLOBAL")));
             else if(playerCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your command in use is: /" + playerCommandMap.get(sender.getName()).replace("[op]", ""));
+               sender.sendMessage("Your command in use is: /" + commandMap.get(playerCommandMap.get(sender.getName())));
             else
                sender.sendMessage("You have no associated command");
          }
@@ -370,17 +434,29 @@ public class CommandMain extends JavaPlugin{
       else if(commandLabel.compareToIgnoreCase("displaydeathcommand") == 0){
          if(sender.hasPermission("autoruncommands.displaydeath")){
             if(deathCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get("GLOBAL").replace("[op]", ""));
+               sender.sendMessage("Your death command in use is: /" + commandMap.get(deathCommandMap.get("GLOBAL")));
             else if(deathCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your death command in use is: /" + deathCommandMap.get(sender.getName().replace("[op]", "")));
+               sender.sendMessage("Your death command in use is: /" + commandMap.get(deathCommandMap.get(sender.getName())));
             else
                sender.sendMessage("You have no associated death command");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
+      else if(commandLabel.compareToIgnoreCase("displayrespawncommand") == 0){
+         if(sender.hasPermission("autoruncommands.displayrespawn")){
+            if(respawnCommandMap.get("GLOBAL") != null)
+               sender.sendMessage("Your respawn command in use is: /" + commandMap.get(respawnCommandMap.get("GLOBAL")));
+            else if(respawnCommandMap.get(sender.getName()) != null)
+               sender.sendMessage("Your respawn command in use is: /" + commandMap.get(respawnCommandMap.get(sender.getName())));
+            else
+               sender.sendMessage("You have no associated respawn command");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
       else if(commandLabel.compareToIgnoreCase("displaystartupcommands") == 0){
-         if(sender.hasPermission("autoruncommands.displaydeath")){
+         if(sender.hasPermission("autoruncommands.displaystartup")){
             if(!startupCommands.isEmpty()){
                sender.sendMessage("The commands that run on start up are:");
                StringTokenizer st = new StringTokenizer(startupCommands, ":");
@@ -527,14 +603,19 @@ public class CommandMain extends JavaPlugin{
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
-      }if(commandLabel.compareToIgnoreCase("setdeathcommand") == 0){
+      }else if(commandLabel.compareToIgnoreCase("setdeathcommand") == 0){
          if(sender.hasPermission("autoruncommands.setdeath")){
             if(args.length != 0){
                String command = args[0];
                String associate;
                
-               if(args.length == 2)
-                  associate = args[1];
+               if(args.length == 2){
+                  if(getServer().getPlayer(args[1]) == null){
+                     sender.sendMessage("No player found with that name");
+                     return true;
+                  }
+                  associate = getServer().getPlayer(args[1]).getName();
+               }
                else
                   associate = sender.getName();
                
@@ -550,6 +631,46 @@ public class CommandMain extends JavaPlugin{
                      deathCommandMap.remove(associate);
                   }
                   deathCommandMap.put(associate, command + "[op]");
+                  sender.sendMessage("OP command association successful");
+               }
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("Not enough arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }else if(commandLabel.compareToIgnoreCase("setrespawncommand") == 0){
+         if(sender.hasPermission("autoruncommands.setrespawn")){
+            if(args.length != 0){
+               String command = args[0];
+               String associate;
+               
+               if(args.length == 2){
+                  if(getServer().getPlayer(args[1]) == null){
+                     sender.sendMessage("No player found with that name");
+                     return true;
+                  }
+                  associate = getServer().getPlayer(args[1]).getName();
+               }
+               else
+                  associate = sender.getName();
+               
+               if(commandMap.get(command) != null){
+                  if(respawnCommandMap.get(associate) != null){
+                     respawnCommandMap.remove(associate);
+                  }
+                  respawnCommandMap.put(associate, command);
+                  sender.sendMessage("Command association successful");
+               }
+               else if(commandMap.get(command + "[op]") != null){
+                  if(respawnCommandMap.get(associate) != null){
+                     respawnCommandMap.remove(associate);
+                  }
+                  respawnCommandMap.put(associate, command + "[op]");
                   sender.sendMessage("OP command association successful");
                }
                else{
@@ -633,6 +754,10 @@ public class CommandMain extends JavaPlugin{
 
    public HashMap<String, String> getPlayerDeathMap(){
       return deathCommandMap;
+   }
+
+   public HashMap<String, String> getPlayerRespawnMap(){
+      return respawnCommandMap;
    }
 
    public HashMap<Location, String> getBlockCommandMap(){

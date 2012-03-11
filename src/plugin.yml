@@ -11,6 +11,9 @@ commands:
    displaydeathcommand:
       description: Shows the command associated with the player upon death
       usage: /displaydeathcommand
+   displayrespawncommand:
+      description: Shows the command associated with the player upon respawn
+      usage: /displaydeathcommand
    removeclickcommand:
       description: Removes the player from the player click list
       usage: /removeclickcommand [player_name]
@@ -29,6 +32,12 @@ commands:
    removedeathcommand:
       description: Removes a command from the player for when they die
       usage: /removedeathcommand [player_name]
+   setrespawncommand:
+      description: Binds a command to the player for when they respawn
+      usage: /setrespawncommand <identifier> [player_name]
+   removerespawncommand:
+      description: Removes a command from the player for when they respawn
+      usage: /removerespawncommand [player_name]
    addstartupcommand:
       description: Add a command to run at server start up
       usage: /addstartupcommand <identifier>

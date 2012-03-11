@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class CommandPlayerListener implements Listener{
    private CommandMain plugin;
@@ -112,5 +113,22 @@ public class CommandPlayerListener implements Listener{
    @EventHandler
    public void onPlayerQuit(PlayerQuitEvent event){
       plugin.getPlayerPosMap().remove(event.getPlayer().getName());
+   }
+   
+   @EventHandler
+   public void onPlayerRespawn(PlayerRespawnEvent event){
+      String command;
+      
+      if(plugin.getPlayerRespawnMap().get("GLOBAL") != null){
+         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get("GLOBAL")).replace("potato", event.getPlayer().getName());
+         plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      }
+      else if(plugin.getPlayerRespawnMap().get(event.getPlayer().getName()) != null){
+         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get(event.getPlayer().getName())).replace("potato", event.getPlayer().getName());
+         if(command.contains("[op]"))
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+         else
+            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      }
    }
 }
