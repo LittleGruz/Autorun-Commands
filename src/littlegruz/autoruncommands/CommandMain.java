@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -33,6 +34,7 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> commandMap;
    private HashMap<String, Location> playerPosMap;
    private HashMap<String, String> deathCommandMap;
+   private Stack<Location> buttons;
    private File playerFile;
    private File commandFile;
    private File blockFile;
@@ -124,7 +126,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.4.1 is melting! MELTING!");
+      log.info("Autorun Commands v2.5 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -270,6 +272,7 @@ public class CommandMain extends JavaPlugin{
       startupDone = false;
       blockCommand = "";
       playerPosMap = new HashMap<String, Location>();
+      buttons = new Stack<Location>();
       
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
@@ -277,7 +280,7 @@ public class CommandMain extends JavaPlugin{
       getServer().getPluginManager().registerEvents(new CommandEntityListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandServerListener(this), this);
       
-      log.info("Autorun Commands v2.4.1 is enabled");
+      log.info("Autorun Commands v2.5 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -422,6 +425,10 @@ public class CommandMain extends JavaPlugin{
             if(args.length > 1){
                String id;
                String command;
+               if(commandMap.get(args[0] + "[op]") != null){
+                  sender.sendMessage("An op command with that name already exists");
+                  return true;
+               }
                id = args[0];
                command = args[1];
                for(int i = 2; i < args.length; i++){
@@ -441,6 +448,10 @@ public class CommandMain extends JavaPlugin{
             if(args.length > 1){
                String id;
                String command;
+               if(commandMap.get(args[0]) != null){
+                  sender.sendMessage("A non-op command with that name already exists");
+                  return true;
+               }
                id = args[0] + "[op]";
                command = args[1];
                for(int i = 2; i < args.length; i++){
@@ -460,25 +471,36 @@ public class CommandMain extends JavaPlugin{
       else if(commandLabel.compareToIgnoreCase("removeacommand") == 0){
          if(sender.hasPermission("autoruncommands.removecommand")){
             if(args.length == 1){
-               if(commandMap.remove(args[0]) != null){
+               boolean remove = false;
+               String rmCommand = args[0];
+               
+               //Check if the command to be removed exists or is op
+               if(commandMap.remove(rmCommand) != null)
+                  remove = true;
+               else if(commandMap.remove(rmCommand + "[op]") != null){
+                  rmCommand += "[op]";
+                  remove = true;
+               }
+                  
+               if(remove){
                   ArrayList<String> names = new ArrayList<String>();
                   // Remove the command where it is associated with players
                   Iterator<Map.Entry<String, String>> it1 = playerCommandMap.entrySet().iterator();
                   while(it1.hasNext()){
                      Entry<String, String> mp1 = it1.next();
-                     if(mp1.getValue().compareTo(args[0]) == 0)
+                     if(mp1.getValue().compareTo(rmCommand) == 0)
                         names.add(mp1.getKey());
                   }
                   for(int i = 0; i < names.size(); i++)
                      playerCommandMap.remove(names.get(i));
                   names.clear();
-   
+
                   // Remove the command where it is associated with blocks
                   ArrayList<Location> places = new ArrayList<Location>();
                   Iterator<Map.Entry<Location, String>> it2 = blockCommandMap.entrySet().iterator();
                   while(it2.hasNext()){
                      Entry<Location, String> mp2 = it2.next();
-                     if(mp2.getValue().compareTo(args[0]) == 0)
+                     if(mp2.getValue().compareTo(rmCommand) == 0)
                         places.add(mp2.getKey());
                   }
                   for(int i = 0; i < places.size(); i++)
@@ -489,7 +511,7 @@ public class CommandMain extends JavaPlugin{
                   it1 = deathCommandMap.entrySet().iterator();
                   while(it1.hasNext()){
                      Entry<String, String> mp1 = it1.next();
-                     if(mp1.getValue().compareTo(args[0]) == 0)
+                     if(mp1.getValue().compareTo(rmCommand) == 0)
                         names.add(mp1.getKey());
                   }
                   for(int i = 0; i < names.size(); i++)
@@ -497,14 +519,14 @@ public class CommandMain extends JavaPlugin{
                   names.clear();
                   names.trimToSize();
                   
-                  startupCommands = startupCommands.replace(":" + args[0], "");
+                  startupCommands = startupCommands.replace(":" + rmCommand, "");
                   sender.sendMessage("Command removed");
                }
                else
                   sender.sendMessage("No command was found with that identifer");
             }
             else
-               sender.sendMessage("You forgot to add the identifier to remove");
+               sender.sendMessage("No command identifier given");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
@@ -650,5 +672,9 @@ public class CommandMain extends JavaPlugin{
 
    public void setStartupDone(boolean startupDone) {
       this.startupDone = startupDone;
+   }
+
+   public Stack<Location> getButtons(){
+      return buttons;
    }
 }
