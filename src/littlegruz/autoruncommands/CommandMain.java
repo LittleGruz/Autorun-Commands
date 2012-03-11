@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -34,7 +33,6 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> commandMap;
    private HashMap<String, Location> playerPosMap;
    private HashMap<String, String> deathCommandMap;
-   private Stack<Location> buttons;
    private File playerFile;
    private File commandFile;
    private File blockFile;
@@ -272,7 +270,6 @@ public class CommandMain extends JavaPlugin{
       startupDone = false;
       blockCommand = "";
       playerPosMap = new HashMap<String, Location>();
-      buttons = new Stack<Location>();
       
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
@@ -672,9 +669,5 @@ public class CommandMain extends JavaPlugin{
 
    public void setStartupDone(boolean startupDone) {
       this.startupDone = startupDone;
-   }
-
-   public Stack<Location> getButtons(){
-      return buttons;
    }
 }
