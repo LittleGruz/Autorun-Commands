@@ -124,7 +124,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.5 is melting! MELTING!");
+      log.info("Autorun Commands v2.6 is melting! MELTING!");
    }
 
    public void onEnable(){
@@ -277,7 +277,7 @@ public class CommandMain extends JavaPlugin{
       getServer().getPluginManager().registerEvents(new CommandEntityListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandServerListener(this), this);
       
-      log.info("Autorun Commands v2.5 is enabled");
+      log.info("Autorun Commands v2.6 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){

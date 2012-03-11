@@ -89,7 +89,8 @@ public class CommandPlayerListener implements Listener{
       
       if(!loc.equals(plugin.getPlayerPosMap().get(event.getPlayer().getName()))){
          //If the player is above a command block then execute the command
-         if(plugin.getBlockCommandMap().get(loc) != null){
+         if(plugin.getBlockCommandMap().get(loc) != null
+               && loc.getBlock().getType().compareTo(Material.STONE_BUTTON) != 0){
             String command;
             command = plugin.getBlockCommandMap().get(loc);
             plugin.getPlayerPosMap().put(event.getPlayer().getName(), loc);
