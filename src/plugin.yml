@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 2.6
+version: 2.7
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -50,6 +50,12 @@ commands:
    removeacommand:
       description: Remove a command from the map of commands
       usage: /removeacommand <identifier>
+   addrepeatcommand:
+      description: Add a command to run at server start up
+      usage: /addrepeatcommand <identifier> <time_interval>
+   removerepeatcommand:
+      description: Remove a command from running at server start up
+      usage: /removerepeatcommand <identifier>
 permissions:
    autoruncommands.*:
       description: All the AutorunCommand commands

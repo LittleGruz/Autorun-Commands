@@ -34,12 +34,14 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, Location> playerPosMap;
    private HashMap<String, String> deathCommandMap;
    private HashMap<String, String> respawnCommandMap;
+   private HashMap<String, Integer> repeatCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
    private File deathFile;
    private File respawnFile;
    private File startupFile;
+   private File repeatFile;
    private boolean placeBlock;
    private boolean startupDone;
    private String blockCommand;
@@ -125,6 +127,22 @@ public class CommandMain extends JavaPlugin{
          bw.close();
       }catch(IOException e){
          log.info("Error saving server start up command file");
+      }
+      
+      //Save repeat command data
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(repeatFile));
+         Iterator<Map.Entry<String, Integer>> it = repeatCommandMap.entrySet().iterator();
+         
+         //Save the players and corresponding commands
+         bw.write("<Command> <Interval>\n");
+         while(it.hasNext()){
+            Entry<String, Integer> mp = it.next();
+            bw.write(mp.getKey() + " " + mp.getValue().toString() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving player repeat command file");
       }
       
       //Save command data
@@ -278,6 +296,30 @@ public class CommandMain extends JavaPlugin{
          log.info("Error reading start up command file");
       }catch(Exception e){
          log.info("Incorrectly formatted start up command file");
+      }
+      
+      //Load the repeat command file data
+      repeatCommandMap = new HashMap<String, Integer>();
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(repeatFile));
+         StringTokenizer st;
+         String input;
+         
+         //Assumes that the name is only one token long
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Command> <Interval>") == 0){
+               continue;
+            }
+            st = new StringTokenizer(input, " ");
+            repeatCommandMap.put(st.nextToken(), Integer.parseInt(st.nextToken()));
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original repeat command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading repeat command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted repeat command file");
       }
       
       //Load the command file data
@@ -720,6 +762,56 @@ public class CommandMain extends JavaPlugin{
             }
             else
                sender.sendMessage("Not enough arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      //TODO New code start here
+      else if(commandLabel.compareToIgnoreCase("addrepeatcommand") == 0){
+         if(sender.hasPermission("autoruncommands.addrepeat")){
+            if(args.length != 2){
+               try{
+                  String command = args[0];
+                  int interval = Integer.parseInt(args[1]);
+                  
+                  if(commandMap.get(command) != null){
+                     
+                  }
+                  else if(commandMap.get(command + "[op]") != null){
+                     
+                  }
+                  else{
+                     sender.sendMessage("No command found with that identifier");
+                     sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+                  }
+               }catch(NumberFormatException e){
+                  sender.sendMessage("Please enter an integer for the repeating inverval");
+               }
+            }
+            else
+               sender.sendMessage("Wrong number of arguments");
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
+      else if(commandLabel.compareToIgnoreCase("removerepeatcommand") == 0){
+         if(sender.hasPermission("autoruncommands.removerepeat")){
+            if(args.length != 1){
+               String command = args[0];
+               
+               if(commandMap.get(command) != null){
+                  
+               }
+               else if(commandMap.get(command + "[op]") != null){
+                  
+               }
+               else{
+                  sender.sendMessage("No command found with that identifier");
+                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               }
+            }
+            else
+               sender.sendMessage("Wrong number of arguments");
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
