@@ -173,7 +173,7 @@ public class CommandMain extends JavaPlugin{
       deathFile = new File(getDataFolder().toString() + "/deathList.txt");
       respawnFile = new File(getDataFolder().toString() + "/respawnList.txt");
       startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
-      repeatFile = new File(getDataFolder().toString() + "/repeatCommands.txt");
+      repeatFile = new File(getDataFolder().toString() + "/repeatList.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -354,6 +354,8 @@ public class CommandMain extends JavaPlugin{
       }catch(Exception e){
          log.info("Incorrectly formatted command file");
       }
+      
+      //Start running the repeating tasks
       
       placeBlock = false;
       startupDone = false;
@@ -779,26 +781,32 @@ public class CommandMain extends JavaPlugin{
                   
                   interval = Integer.parseInt(args[1]);
                   
-                  if(commandMap.get(command) != null){
+                  if(commandMap.get(command) != null
+                        && runningRepeatCommandMap.get(command) == null){
                      id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
 
                         public void run() {
                             getServer().broadcastMessage("Not op");
                         }
                      }, interval * 20, interval * 20);
-                     
+
+                     repeatCommandMap.put(command, interval);
                      runningRepeatCommandMap.put(command, id);
                   }
-                  else if(commandMap.get(command + "[op]") != null){
+                  else if(commandMap.get(command + "[op]") != null
+                        && runningRepeatCommandMap.get(command) == null){
                      id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
 
                         public void run() {
                             getServer().broadcastMessage("Is op");
                         }
                      }, interval * 20, interval * 20);
-                     
+
+                     repeatCommandMap.put(command, interval);
                      runningRepeatCommandMap.put(command, id);
                   }
+                  else if(runningRepeatCommandMap.get(command) != null)
+                     sender.sendMessage("That command is already repeating");
                   else{
                      sender.sendMessage("No command found with that identifier");
                      sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
@@ -872,6 +880,14 @@ public class CommandMain extends JavaPlugin{
 
    public HashMap<Location, String> getBlockCommandMap(){
       return blockCommandMap;
+   }
+
+   public HashMap<String, Integer> getRepeatMap(){
+      return repeatCommandMap;
+   }
+
+   public HashMap<String, Integer> getRunningRepeatMap(){
+      return runningRepeatCommandMap;
    }
 
    public HashMap<String, String> getCommandMap(){
