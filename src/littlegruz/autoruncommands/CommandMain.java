@@ -35,6 +35,7 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> deathCommandMap;
    private HashMap<String, String> respawnCommandMap;
    private HashMap<String, Integer> repeatCommandMap;
+   private HashMap<String, Integer> runningRepeatCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
@@ -172,6 +173,7 @@ public class CommandMain extends JavaPlugin{
       deathFile = new File(getDataFolder().toString() + "/deathList.txt");
       respawnFile = new File(getDataFolder().toString() + "/respawnList.txt");
       startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
+      repeatFile = new File(getDataFolder().toString() + "/repeatCommands.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -357,6 +359,7 @@ public class CommandMain extends JavaPlugin{
       startupDone = false;
       blockCommand = "";
       playerPosMap = new HashMap<String, Location>();
+      runningRepeatCommandMap = new HashMap<String, Integer>();
       
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
@@ -769,16 +772,32 @@ public class CommandMain extends JavaPlugin{
       //TODO New code start here
       else if(commandLabel.compareToIgnoreCase("addrepeatcommand") == 0){
          if(sender.hasPermission("autoruncommands.addrepeat")){
-            if(args.length != 2){
+            if(args.length == 2){
                try{
                   String command = args[0];
-                  int interval = Integer.parseInt(args[1]);
+                  int interval, id;
+                  
+                  interval = Integer.parseInt(args[1]);
                   
                   if(commandMap.get(command) != null){
+                     id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
+
+                        public void run() {
+                            getServer().broadcastMessage("Not op");
+                        }
+                     }, interval * 20, interval * 20);
                      
+                     runningRepeatCommandMap.put(command, id);
                   }
                   else if(commandMap.get(command + "[op]") != null){
+                     id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
+
+                        public void run() {
+                            getServer().broadcastMessage("Is op");
+                        }
+                     }, interval * 20, interval * 20);
                      
+                     runningRepeatCommandMap.put(command, id);
                   }
                   else{
                      sender.sendMessage("No command found with that identifier");
@@ -796,14 +815,13 @@ public class CommandMain extends JavaPlugin{
       }
       else if(commandLabel.compareToIgnoreCase("removerepeatcommand") == 0){
          if(sender.hasPermission("autoruncommands.removerepeat")){
-            if(args.length != 1){
+            if(args.length == 1){
                String command = args[0];
                
-               if(commandMap.get(command) != null){
-                  
-               }
-               else if(commandMap.get(command + "[op]") != null){
-                  
+               if(commandMap.get(command) != null || commandMap.get(command + "[op]") != null){
+                  getServer().getScheduler().cancelTask(runningRepeatCommandMap.get(command));
+                  runningRepeatCommandMap.remove(command);
+                  repeatCommandMap.remove(command);
                }
                else{
                   sender.sendMessage("No command found with that identifier");

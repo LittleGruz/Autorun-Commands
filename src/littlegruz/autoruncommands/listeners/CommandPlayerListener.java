@@ -70,15 +70,17 @@ public class CommandPlayerListener implements Listener{
          }
       }
       else{
-         if(event.getClickedBlock().getType().compareTo(Material.STONE_BUTTON) == 0
-               && plugin.getBlockCommandMap().get(event.getClickedBlock().getLocation()) != null){
-            String command;
-            command = plugin.getBlockCommandMap().get(event.getClickedBlock().getLocation());
-            if(command.contains("[op]"))
-               plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
-            else
-               plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
-         }
+         try{
+            if(event.getClickedBlock().getType().compareTo(Material.STONE_BUTTON) == 0
+                  && plugin.getBlockCommandMap().get(event.getClickedBlock().getLocation()) != null){
+               String command;
+               command = plugin.getBlockCommandMap().get(event.getClickedBlock().getLocation());
+               if(command.contains("[op]"))
+                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+               else
+                  plugin.getServer().dispatchCommand(event.getPlayer(), plugin.getCommandMap().get(command).replace("potato", event.getPlayer().getName()));
+            }
+         }catch(Exception e){}
       }
    }
    
