@@ -161,7 +161,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.6 is melting! MELTING!");
+      log.info("Autorun Commands v2.7 disabled");
    }
 
    public void onEnable(){
@@ -369,7 +369,7 @@ public class CommandMain extends JavaPlugin{
       getServer().getPluginManager().registerEvents(new CommandEntityListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandServerListener(this), this);
       
-      log.info("Autorun Commands v2.6 is enabled");
+      log.info("Autorun Commands v2.7 is enabled");
    }
    
    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -771,21 +771,29 @@ public class CommandMain extends JavaPlugin{
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
-      //TODO New code start here
       else if(commandLabel.compareToIgnoreCase("addrepeatcommand") == 0){
          if(sender.hasPermission("autoruncommands.addrepeat")){
             if(args.length == 2){
                try{
-                  final String command = args[0];
+                  final String command;
                   int interval, id;
+                  
+                  // Get the commands or stop if it does not exist
+                  if(commandMap.get(args[0]) != null)
+                     command = commandMap.get(args[0]);
+                  else if(commandMap.get(args[0] + "[op]") != null)
+                     command = commandMap.get(args[0] + "[op]");
+                  else{
+                     sender.sendMessage("No command found with that identifier");
+                     sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+                     return true;
+                  }
                   
                   interval = Integer.parseInt(args[1]);
                   
                   // If the command is found and is not already repeating, add it
                   // NOTE: All commands will be run by the console
-                  if((commandMap.get(command) != null
-                        || commandMap.get(command + "[op]") != null)
-                        && runningRepeatCommandMap.get(command) == null){
+                  if(runningRepeatCommandMap.get(args[0]) == null){
                      id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
 
                         public void run() {
@@ -795,13 +803,11 @@ public class CommandMain extends JavaPlugin{
 
                      repeatCommandMap.put(command, interval);
                      runningRepeatCommandMap.put(command, id);
+                     sender.sendMessage("That command will repeat every "
+                           + interval + " seconds from now");
                   }
-                  else if(runningRepeatCommandMap.get(command) != null)
+                  else
                      sender.sendMessage("That command is already repeating");
-                  else{
-                     sender.sendMessage("No command found with that identifier");
-                     sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-                  }
                }catch(NumberFormatException e){
                   sender.sendMessage("Please enter an integer for the repeating inverval");
                }
@@ -821,6 +827,7 @@ public class CommandMain extends JavaPlugin{
                   getServer().getScheduler().cancelTask(runningRepeatCommandMap.get(command));
                   runningRepeatCommandMap.remove(command);
                   repeatCommandMap.remove(command);
+                  sender.sendMessage("That command has now stopped repeating");
                }
                else{
                   sender.sendMessage("No command found with that identifier");
