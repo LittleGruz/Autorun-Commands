@@ -40,33 +40,22 @@ public class CommandServerListener implements Listener {
       plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
          public void run() {
-            String command;
             int id, interval;
             Iterator<Map.Entry<String, Integer>> it = plugin.getRepeatMap().entrySet().iterator();
             
             // The running of the tasks
             while(it.hasNext()){
                Entry<String, Integer> mp = it.next();
-               command = mp.getKey();
+               final String command = mp.getKey();
                interval = mp.getValue();
                
-               if(plugin.getCommandMap().get(command) != null
+               if((plugin.getCommandMap().get(command) != null
+                     || plugin.getCommandMap().get(command + "[op]") != null)
                      && plugin.getRunningRepeatMap().get(command) == null){
                   id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin,  new Runnable() {
 
                      public void run() {
-                        plugin.getServer().broadcastMessage("Not op");
-                     }
-                  }, interval * 20, interval * 20);
-                  
-                  plugin.getRunningRepeatMap().put(command, id);
-               }
-               else if(plugin.getCommandMap().get(command + "[op]") != null
-                     && plugin.getRunningRepeatMap().get(command) == null){
-                  id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin,  new Runnable() {
-
-                     public void run() {
-                        plugin.getServer().broadcastMessage("Is op");
+                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
                      }
                   }, interval * 20, interval * 20);
                   

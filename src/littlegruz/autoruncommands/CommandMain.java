@@ -776,29 +776,20 @@ public class CommandMain extends JavaPlugin{
          if(sender.hasPermission("autoruncommands.addrepeat")){
             if(args.length == 2){
                try{
-                  String command = args[0];
+                  final String command = args[0];
                   int interval, id;
                   
                   interval = Integer.parseInt(args[1]);
                   
-                  if(commandMap.get(command) != null
+                  // If the command is found and is not already repeating, add it
+                  // NOTE: All commands will be run by the console
+                  if((commandMap.get(command) != null
+                        || commandMap.get(command + "[op]") != null)
                         && runningRepeatCommandMap.get(command) == null){
                      id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
 
                         public void run() {
-                            getServer().broadcastMessage("Not op");
-                        }
-                     }, interval * 20, interval * 20);
-
-                     repeatCommandMap.put(command, interval);
-                     runningRepeatCommandMap.put(command, id);
-                  }
-                  else if(commandMap.get(command + "[op]") != null
-                        && runningRepeatCommandMap.get(command) == null){
-                     id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
-
-                        public void run() {
-                            getServer().broadcastMessage("Is op");
+                           getServer().dispatchCommand(getServer().getConsoleSender(), command);
                         }
                      }, interval * 20, interval * 20);
 
