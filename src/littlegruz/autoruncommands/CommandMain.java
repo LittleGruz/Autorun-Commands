@@ -780,9 +780,9 @@ public class CommandMain extends JavaPlugin{
                   
                   // Get the commands or stop if it does not exist
                   if(commandMap.get(args[0]) != null)
-                     command = commandMap.get(args[0]);
+                     command = args[0];
                   else if(commandMap.get(args[0] + "[op]") != null)
-                     command = commandMap.get(args[0] + "[op]");
+                     command = args[0] + "[op]";
                   else{
                      sender.sendMessage("No command found with that identifier");
                      sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
@@ -797,7 +797,7 @@ public class CommandMain extends JavaPlugin{
                      id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
 
                         public void run() {
-                           getServer().dispatchCommand(getServer().getConsoleSender(), command);
+                           getServer().dispatchCommand(getServer().getConsoleSender(), commandMap.get(command));
                         }
                      }, interval * 20, interval * 20);
 

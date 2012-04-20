@@ -55,7 +55,7 @@ public class CommandServerListener implements Listener {
                   id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin,  new Runnable() {
 
                      public void run() {
-                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
                      }
                   }, interval * 20, interval * 20);
                   
