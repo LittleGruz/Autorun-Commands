@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,13 +15,19 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import littlegruz.autoruncommands.commands.Blocks;
+import littlegruz.autoruncommands.commands.Commands;
+import littlegruz.autoruncommands.commands.Death;
+import littlegruz.autoruncommands.commands.Repeat;
+import littlegruz.autoruncommands.commands.Respawn;
+import littlegruz.autoruncommands.commands.RightClick;
+import littlegruz.autoruncommands.commands.Startup;
 import littlegruz.autoruncommands.listeners.CommandBlockListener;
 import littlegruz.autoruncommands.listeners.CommandEntityListener;
 import littlegruz.autoruncommands.listeners.CommandPlayerListener;
 import littlegruz.autoruncommands.listeners.CommandServerListener;
 
 import org.bukkit.Location;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -161,7 +166,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.7 disabled");
+      log.info("Autorun Commands v2.7.1 disabled");
    }
 
    public void onEnable(){
@@ -368,480 +373,34 @@ public class CommandMain extends JavaPlugin{
       getServer().getPluginManager().registerEvents(new CommandBlockListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandEntityListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandServerListener(this), this);
+
+      //Set up the commands
+      getCommand("setclickcommand").setExecutor(new RightClick(this));
+      getCommand("removeclickcommand").setExecutor(new RightClick(this));
+      getCommand("displayclickcommand").setExecutor(new RightClick(this));
+
+      getCommand("setdeathcommand").setExecutor(new Death(this));
+      getCommand("removedeathcommand").setExecutor(new Death(this));
+      getCommand("displaydeathcommand").setExecutor(new Death(this));
+
+      getCommand("addrepeatcommand").setExecutor(new Repeat(this));
+      getCommand("removerepeatcommand").setExecutor(new Repeat(this));
+
+      getCommand("addstartupcommand").setExecutor(new Startup(this));
+      getCommand("removestartupcommand").setExecutor(new Startup(this));
+      getCommand("displaystartupcommands").setExecutor(new Startup(this));
+
+      getCommand("setrespawncommand").setExecutor(new Respawn(this));
+      getCommand("removerespawncommand").setExecutor(new Respawn(this));
+      getCommand("displayrespawncommand").setExecutor(new Respawn(this));
+
+      getCommand("setcommandblock").setExecutor(new Blocks(this));
       
-      log.info("Autorun Commands v2.7 is enabled");
-   }
-   
-   public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
-      if(commandLabel.compareToIgnoreCase("setclickcommand") == 0){
-         if(sender.hasPermission("autoruncommands.setclick")){
-            if(args.length != 0){
-               String command = args[0];
-               String associate;
-               
-               if(args.length == 2)
-                  associate = args[1];
-               else
-                  associate = sender.getName();
-               
-               if(commandMap.get(command) != null){
-                  if(playerCommandMap.get(associate) != null){
-                     playerCommandMap.remove(associate);
-                  }
-                  playerCommandMap.put(associate, command);
-                  sender.sendMessage("Command association successful");
-               }
-               else if(commandMap.get(command + "[op]") != null){
-                  if(playerCommandMap.get(associate) != null){
-                     playerCommandMap.remove(associate);
-                  }
-                  playerCommandMap.put(associate, command + "[op]");
-                  sender.sendMessage("OP command association successful");
-               }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Not enough arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removeclickcommand") == 0){
-         if(sender.hasPermission("autoruncommands.removeclick")){
-            String associate;
-            
-            if(args.length == 1)
-               associate = args[0];
-            else
-               associate = sender.getName();
-            
-            if(playerCommandMap.get(associate) != null){
-               playerCommandMap.remove(associate);
-               sender.sendMessage("Command removed");
-            }
-            else
-               sender.sendMessage(associate + " has no associated command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removedeathcommand") == 0){
-         if(sender.hasPermission("autoruncommands.removedeath")){
-            String associate;
-            
-            if(args.length == 1)
-               associate = args[0];
-            else
-               associate = sender.getName();
-            
-            if(deathCommandMap.get(associate) != null){
-               deathCommandMap.remove(associate);
-               sender.sendMessage("Command removed");
-            }
-            else
-               sender.sendMessage(associate + " has no associated death command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removerespawncommand") == 0){
-         if(sender.hasPermission("autoruncommands.removerespawn")){
-            String associate;
-            
-            if(args.length == 1)
-               associate = args[0];
-            else
-               associate = sender.getName();
-            
-            if(respawnCommandMap.get(associate) != null){
-               respawnCommandMap.remove(associate);
-               sender.sendMessage("Command removed");
-            }
-            else
-               sender.sendMessage(associate + " has no associated respawn command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("displayclickcommand") == 0){
-         if(sender.hasPermission("autoruncommands.displayclick")){
-            if(playerCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your command in use is: /" + commandMap.get(playerCommandMap.get("GLOBAL")));
-            else if(playerCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your command in use is: /" + commandMap.get(playerCommandMap.get(sender.getName())));
-            else
-               sender.sendMessage("You have no associated command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("displaydeathcommand") == 0){
-         if(sender.hasPermission("autoruncommands.displaydeath")){
-            if(deathCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your death command in use is: /" + commandMap.get(deathCommandMap.get("GLOBAL")));
-            else if(deathCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your death command in use is: /" + commandMap.get(deathCommandMap.get(sender.getName())));
-            else
-               sender.sendMessage("You have no associated death command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("displayrespawncommand") == 0){
-         if(sender.hasPermission("autoruncommands.displayrespawn")){
-            if(respawnCommandMap.get("GLOBAL") != null)
-               sender.sendMessage("Your respawn command in use is: /" + commandMap.get(respawnCommandMap.get("GLOBAL")));
-            else if(respawnCommandMap.get(sender.getName()) != null)
-               sender.sendMessage("Your respawn command in use is: /" + commandMap.get(respawnCommandMap.get(sender.getName())));
-            else
-               sender.sendMessage("You have no associated respawn command");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("displaystartupcommands") == 0){
-         if(sender.hasPermission("autoruncommands.displaystartup")){
-            if(!startupCommands.isEmpty()){
-               sender.sendMessage("The commands that run on start up are:");
-               StringTokenizer st = new StringTokenizer(startupCommands, ":");
-               while(st.countTokens() > 0)
-                  sender.sendMessage(st.nextToken().replace("[op]", ""));
-            }
-            else
-               sender.sendMessage("You have no commands set to run at start up");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("setcommandblock") == 0){
-         if(sender.hasPermission("autoruncommands.setblock")){
-            if(args.length != 0){
-               if(commandMap.get(args[0]) != null){
-                  blockCommand = args[0];
-                  placeBlock = true;
-                  sender.sendMessage("Right click with your fist to apply \'"
-                  + commandMap.get(args[0]) + "\'");
-               }
-               else if(commandMap.get(args[0] + "[op]") != null){
-                  blockCommand = args[0] + "[op]";
-                  placeBlock = true;
-                  sender.sendMessage("Right click with your fist to apply the OP command \'"
-                  + commandMap.get(args[0] + "[op]").replace("[op]", "") + "\'");
-               }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("No autorun command given");
-         }
-      }
-      else if(commandLabel.compareToIgnoreCase("addacommand") == 0){
-         if(sender.hasPermission("autoruncommands.addcommand")){
-            if(args.length > 1){
-               String id;
-               String command;
-               if(commandMap.get(args[0] + "[op]") != null){
-                  sender.sendMessage("An op command with that name already exists");
-                  return true;
-               }
-               id = args[0];
-               command = args[1];
-               for(int i = 2; i < args.length; i++){
-                  command += " " + args[i];
-               }
-               if(commandMap.put(id, command) != null)
-                  sender.sendMessage("Overwrote old command");
-               else
-                  sender.sendMessage("Command added");
-            }
-            else
-               sender.sendMessage("An identifier and command must be given");
-         }
-      }
-      else if(commandLabel.compareToIgnoreCase("addopcommand") == 0){
-         if(sender.hasPermission("autoruncommands.addopcommand")){
-            if(args.length > 1){
-               String id;
-               String command;
-               if(commandMap.get(args[0]) != null){
-                  sender.sendMessage("A non-op command with that name already exists");
-                  return true;
-               }
-               id = args[0] + "[op]";
-               command = args[1];
-               for(int i = 2; i < args.length; i++){
-                  command += " " + args[i];
-               }
-               if(commandMap.put(id, command) != null)
-                  sender.sendMessage("Overwrote old op command");
-               else
-                  sender.sendMessage("Op command added");
-            }
-            else
-               sender.sendMessage("An identifier and command must be given");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removeacommand") == 0){
-         if(sender.hasPermission("autoruncommands.removecommand")){
-            if(args.length == 1){
-               boolean remove = false;
-               String rmCommand = args[0];
-               
-               //Check if the command to be removed exists or is op
-               if(commandMap.remove(rmCommand) != null)
-                  remove = true;
-               else if(commandMap.remove(rmCommand + "[op]") != null){
-                  rmCommand += "[op]";
-                  remove = true;
-               }
-                  
-               if(remove){
-                  ArrayList<String> names = new ArrayList<String>();
-                  // Remove the command where it is associated with players
-                  Iterator<Map.Entry<String, String>> it1 = playerCommandMap.entrySet().iterator();
-                  while(it1.hasNext()){
-                     Entry<String, String> mp1 = it1.next();
-                     if(mp1.getValue().compareTo(rmCommand) == 0)
-                        names.add(mp1.getKey());
-                  }
-                  for(int i = 0; i < names.size(); i++)
-                     playerCommandMap.remove(names.get(i));
-                  names.clear();
-
-                  // Remove the command where it is associated with blocks
-                  ArrayList<Location> places = new ArrayList<Location>();
-                  Iterator<Map.Entry<Location, String>> it2 = blockCommandMap.entrySet().iterator();
-                  while(it2.hasNext()){
-                     Entry<Location, String> mp2 = it2.next();
-                     if(mp2.getValue().compareTo(rmCommand) == 0)
-                        places.add(mp2.getKey());
-                  }
-                  for(int i = 0; i < places.size(); i++)
-                     blockCommandMap.remove(places.get(i));
-                  places.clear();
-                  
-                  // Remove the command where it is associated with the death of players
-                  it1 = deathCommandMap.entrySet().iterator();
-                  while(it1.hasNext()){
-                     Entry<String, String> mp1 = it1.next();
-                     if(mp1.getValue().compareTo(rmCommand) == 0)
-                        names.add(mp1.getKey());
-                  }
-                  for(int i = 0; i < names.size(); i++)
-                     deathCommandMap.remove(names.get(i));
-                  names.clear();
-                  names.trimToSize();
-                  
-                  startupCommands = startupCommands.replace(":" + rmCommand, "");
-                  sender.sendMessage("Command removed");
-               }
-               else
-                  sender.sendMessage("No command was found with that identifer");
-            }
-            else
-               sender.sendMessage("No command identifier given");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }else if(commandLabel.compareToIgnoreCase("setdeathcommand") == 0){
-         if(sender.hasPermission("autoruncommands.setdeath")){
-            if(args.length != 0){
-               String command = args[0];
-               String associate;
-               
-               if(args.length == 2){
-                  if(getServer().getPlayer(args[1]) == null){
-                     sender.sendMessage("No player found with that name");
-                     return true;
-                  }
-                  associate = getServer().getPlayer(args[1]).getName();
-               }
-               else
-                  associate = sender.getName();
-               
-               if(commandMap.get(command) != null){
-                  if(deathCommandMap.get(associate) != null){
-                     deathCommandMap.remove(associate);
-                  }
-                  deathCommandMap.put(associate, command);
-                  sender.sendMessage("Command association successful");
-               }
-               else if(commandMap.get(command + "[op]") != null){
-                  if(deathCommandMap.get(associate) != null){
-                     deathCommandMap.remove(associate);
-                  }
-                  deathCommandMap.put(associate, command + "[op]");
-                  sender.sendMessage("OP command association successful");
-               }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Not enough arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }else if(commandLabel.compareToIgnoreCase("setrespawncommand") == 0){
-         if(sender.hasPermission("autoruncommands.setrespawn")){
-            if(args.length != 0){
-               String command = args[0];
-               String associate;
-               
-               if(args.length == 2){
-                  if(getServer().getPlayer(args[1]) == null){
-                     sender.sendMessage("No player found with that name");
-                     return true;
-                  }
-                  associate = getServer().getPlayer(args[1]).getName();
-               }
-               else
-                  associate = sender.getName();
-               
-               if(commandMap.get(command) != null){
-                  if(respawnCommandMap.get(associate) != null){
-                     respawnCommandMap.remove(associate);
-                  }
-                  respawnCommandMap.put(associate, command);
-                  sender.sendMessage("Command association successful");
-               }
-               else if(commandMap.get(command + "[op]") != null){
-                  if(respawnCommandMap.get(associate) != null){
-                     respawnCommandMap.remove(associate);
-                  }
-                  respawnCommandMap.put(associate, command + "[op]");
-                  sender.sendMessage("OP command association successful");
-               }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Not enough arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("addstartupcommand") == 0){
-         if(sender.hasPermission("autoruncommands.addstartup")){
-            if(args.length != 0){
-               String command = args[0];
-               
-               if(commandMap.get(command) != null)
-                  addStartupCommand(sender, command);
-               else if(commandMap.get(command + "[op]") != null)
-                  addStartupCommand(sender, command);
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Not enough arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removestartupcommand") == 0){
-         if(sender.hasPermission("autoruncommands.removestartup")){
-            if(args.length != 0){
-               String command = args[0];
-               
-               if(commandMap.get(command) != null)
-                  removeStartupCommand(sender, command);
-               else if(commandMap.get(command + "[op]") != null)
-                  removeStartupCommand(sender, command + "[op]");
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Not enough arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("addrepeatcommand") == 0){
-         if(sender.hasPermission("autoruncommands.addrepeat")){
-            if(args.length == 2){
-               try{
-                  final String command;
-                  int interval, id;
-                  
-                  // Get the commands or stop if it does not exist
-                  if(commandMap.get(args[0]) != null)
-                     command = args[0];
-                  else if(commandMap.get(args[0] + "[op]") != null)
-                     command = args[0] + "[op]";
-                  else{
-                     sender.sendMessage("No command found with that identifier");
-                     sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-                     return true;
-                  }
-                  
-                  interval = Integer.parseInt(args[1]);
-                  
-                  // If the command is found and is not already repeating, add it
-                  // NOTE: All commands will be run by the console
-                  if(runningRepeatCommandMap.get(args[0]) == null){
-                     id = getServer().getScheduler().scheduleAsyncRepeatingTask(this,  new Runnable() {
-
-                        public void run() {
-                           getServer().dispatchCommand(getServer().getConsoleSender(), commandMap.get(command));
-                        }
-                     }, interval * 20, interval * 20);
-
-                     repeatCommandMap.put(command, interval);
-                     runningRepeatCommandMap.put(command, id);
-                     sender.sendMessage("That command will repeat every "
-                           + interval + " seconds from now");
-                  }
-                  else
-                     sender.sendMessage("That command is already repeating");
-               }catch(NumberFormatException e){
-                  sender.sendMessage("Please enter an integer for the repeating inverval");
-               }
-            }
-            else
-               sender.sendMessage("Wrong number of arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
-      else if(commandLabel.compareToIgnoreCase("removerepeatcommand") == 0){
-         if(sender.hasPermission("autoruncommands.removerepeat")){
-            if(args.length == 1){
-               String command = args[0];
-               
-               if(commandMap.get(command) != null || commandMap.get(command + "[op]") != null){
-                  getServer().getScheduler().cancelTask(runningRepeatCommandMap.get(command));
-                  runningRepeatCommandMap.remove(command);
-                  repeatCommandMap.remove(command);
-                  sender.sendMessage("That command has now stopped repeating");
-               }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
-               }
-            }
-            else
-               sender.sendMessage("Wrong number of arguments");
-         }
-         else
-            sender.sendMessage("You don't have sufficient permissions");
-      }
+      getCommand("addacommand").setExecutor(new Commands(this));
+      getCommand("addopcommand").setExecutor(new Commands(this));
+      getCommand("removeacommand").setExecutor(new Commands(this));
       
-      return true;
+      log.info("Autorun Commands v2.7.1 is enabled");
    }
    
    public void removeStartupCommand(CommandSender sender, String command){
@@ -904,12 +463,20 @@ public class CommandMain extends JavaPlugin{
       return blockCommand;
    }
 
+   public void setBlockCommand(String blockCommand){
+      this.blockCommand = blockCommand;
+   }
+
    public HashMap<String, Location> getPlayerPosMap() {
       return playerPosMap;
    }
 
    public String getStartupCommands() {
       return startupCommands;
+   }
+
+   public void setStartupCommands(String sc) {
+      this.startupCommands = sc;
    }
 
    public boolean isStartupDone() {
