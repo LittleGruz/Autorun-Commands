@@ -166,7 +166,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v2.7.1 disabled");
+      log.info("Autorun Commands v2.7.2 disabled");
    }
 
    public void onEnable(){
@@ -400,7 +400,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("addopcommand").setExecutor(new Commands(this));
       getCommand("removeacommand").setExecutor(new Commands(this));
       
-      log.info("Autorun Commands v2.7.1 is enabled");
+      log.info("Autorun Commands v2.7.2 is enabled");
    }
    
    public void removeStartupCommand(CommandSender sender, String command){
