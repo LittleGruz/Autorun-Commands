@@ -49,8 +49,10 @@ private CommandMain plugin;
                      sender.sendMessage("That command will repeat every "
                            + interval + " seconds from now");
                   }
-                  else
+                  else{
                      sender.sendMessage("That command is already repeating");
+                  }
+                  return true;
                }catch(NumberFormatException e){
                   sender.sendMessage("Please enter an integer for the repeating inverval");
                }
@@ -66,16 +68,22 @@ private CommandMain plugin;
             if(args.length == 1){
                String command = args[0];
                
-               if(plugin.getCommandMap().get(command) != null || plugin.getCommandMap().get(command + "[op]") != null){
+               if(plugin.getRunningRepeatMap().get(command) != null){
                   plugin.getServer().getScheduler().cancelTask(plugin.getRunningRepeatMap().get(command));
                   plugin.getRunningRepeatMap().remove(command);
                   plugin.getRepeatMap().remove(command);
                   sender.sendMessage("That command has now stopped repeating");
                }
-               else{
-                  sender.sendMessage("No command found with that identifier");
-                  sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
+               else if(plugin.getRunningRepeatMap().get(command + "[op]") != null){
+                  plugin.getServer().getScheduler().cancelTask(plugin.getRunningRepeatMap().get(command + "[op]"));
+                  plugin.getRunningRepeatMap().remove(command + "[op]");
+                  plugin.getRepeatMap().remove(command + "[op]");
+                  sender.sendMessage("That command has now stopped repeating");
                }
+               else{
+                  sender.sendMessage("No command with that identifier is running");
+               }
+               return true;
             }
             else
                sender.sendMessage("Wrong number of arguments");
