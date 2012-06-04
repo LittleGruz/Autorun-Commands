@@ -1,5 +1,8 @@
 package littlegruz.autoruncommands.commands;
 
+import java.util.Date;
+import java.util.StringTokenizer;
+
 import littlegruz.autoruncommands.CommandMain;
 
 import org.bukkit.command.Command;
@@ -20,6 +23,9 @@ private CommandMain plugin;
                try{
                   final String command;
                   int interval, id;
+                  long time = new Date().getTime();
+                  time /= 1000;
+                  
                   
                   // Get the commands or stop if it does not exist
                   if(plugin.getCommandMap().get(args[0]) != null)
@@ -45,7 +51,7 @@ private CommandMain plugin;
                      }, interval * 20, interval * 20);
 
                      plugin.getRepeatMap().put(command, interval);
-                     plugin.getRunningRepeatMap().put(command, id);
+                     plugin.getRunningRepeatMap().put(command, Integer.toString(id) + "|" + Long.toString(time));
                      sender.sendMessage("That command will repeat every "
                            + interval + " seconds from now");
                   }
@@ -66,16 +72,19 @@ private CommandMain plugin;
       else if(commandLabel.compareToIgnoreCase("removerepeatcommand") == 0){
          if(sender.hasPermission("autoruncommands.removerepeat")){
             if(args.length == 1){
+               StringTokenizer st;
                String command = args[0];
                
                if(plugin.getRunningRepeatMap().get(command) != null){
-                  plugin.getServer().getScheduler().cancelTask(plugin.getRunningRepeatMap().get(command));
+                  st = new StringTokenizer(plugin.getRunningRepeatMap().get(command), "|");
+                  plugin.getServer().getScheduler().cancelTask(Integer.getInteger(st.nextToken()));
                   plugin.getRunningRepeatMap().remove(command);
                   plugin.getRepeatMap().remove(command);
                   sender.sendMessage("That command has now stopped repeating");
                }
                else if(plugin.getRunningRepeatMap().get(command + "[op]") != null){
-                  plugin.getServer().getScheduler().cancelTask(plugin.getRunningRepeatMap().get(command + "[op]"));
+                  st = new StringTokenizer(plugin.getRunningRepeatMap().get(command + "[op]"), "|");
+                  plugin.getServer().getScheduler().cancelTask(Integer.parseInt(st.nextToken()));
                   plugin.getRunningRepeatMap().remove(command + "[op]");
                   plugin.getRepeatMap().remove(command + "[op]");
                   sender.sendMessage("That command has now stopped repeating");

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> deathCommandMap;
    private HashMap<String, String> respawnCommandMap;
    private HashMap<String, Integer> repeatCommandMap;
-   private HashMap<String, Integer> runningRepeatCommandMap;
+   private HashMap<String, String> runningRepeatCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
@@ -49,6 +50,7 @@ public class CommandMain extends JavaPlugin{
    private File startupFile;
    private File repeatFile;
    private File joinFile;
+   private File remainderFile;
    private boolean placeBlock;
    private boolean startupDone;
    private String blockCommand;
@@ -149,6 +151,35 @@ public class CommandMain extends JavaPlugin{
          log.info("Error saving server start up command file");
       }
       
+      //Save repeating task remainder times
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(remainderFile));
+         Iterator<Map.Entry<String, String>> it = runningRepeatCommandMap.entrySet().iterator();
+         StringTokenizer st;
+         long time, prevTime;
+         
+         //Save the players and corresponding commands
+         bw.write("<Command> <Remainder>\n");
+         while(it.hasNext()){
+            Entry<String, String> mp = it.next();
+            st = new StringTokenizer(mp.getValue(), "|");
+            time = new Date().getTime();
+            
+            /* Skip over the first token because it is the second one that is desired */
+            st.nextToken();
+            prevTime = Long.parseLong(st.nextToken());
+            
+            time /= 1000;
+            // Get the time left until the command will run again
+            time = repeatCommandMap.get(mp.getKey()) - ((time -  prevTime) % repeatCommandMap.get(mp.getKey()));
+            
+            bw.write(mp.getKey() + " " + time + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving repeating task remaining time");
+      }
+      
       //Save repeat command data
       try{
          BufferedWriter bw = new BufferedWriter(new FileWriter(repeatFile));
@@ -194,6 +225,7 @@ public class CommandMain extends JavaPlugin{
       startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
       repeatFile = new File(getDataFolder().toString() + "/repeatList.txt");
       joinFile = new File(getDataFolder().toString() + "/joinList.txt");
+      remainderFile = new File(getDataFolder().toString() + "/taskRemainder.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -399,13 +431,11 @@ public class CommandMain extends JavaPlugin{
          log.info("Incorrectly formatted command file");
       }
       
-      //Start running the repeating tasks
-      
       placeBlock = false;
       startupDone = false;
       blockCommand = "";
       playerPosMap = new HashMap<String, Location>();
-      runningRepeatCommandMap = new HashMap<String, Integer>();
+      runningRepeatCommandMap = new HashMap<String, String>();
       
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
@@ -488,7 +518,7 @@ public class CommandMain extends JavaPlugin{
       return repeatCommandMap;
    }
 
-   public HashMap<String, Integer> getRunningRepeatMap(){
+   public HashMap<String, String> getRunningRepeatMap(){
       return runningRepeatCommandMap;
    }
 
@@ -538,5 +568,9 @@ public class CommandMain extends JavaPlugin{
 
    public void setPlayerJoinCommand(String jc) {
       joinCommand = jc;
+   }
+
+   public File getRemainderFile(){
+      return remainderFile;
    }
 }
