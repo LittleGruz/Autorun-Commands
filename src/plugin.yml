@@ -56,6 +56,15 @@ commands:
    removerepeatcommand:
       description: Remove a command from running at server start up
       usage: /removerepeatcommand <identifier>
+   setjoincommand:
+      description: Add a command to run when a player joins
+      usage: /setjoincommand <identifier>
+   removejoincommand:
+      description: Remove a command from running when a player joins
+      usage: /removejoincommand <identifier>
+   displayjoincommand:
+      description: Display the command that runs when a player joins
+      usage: /displayjoincommand
 permissions:
    autoruncommands.*:
       description: All the AutorunCommand commands
@@ -66,3 +75,7 @@ permissions:
    autoruncommands.displaydeath:
       description: Shows the command associated with the player upon death
       default: true
+   autoruncommands.displayjoin:
+      description: Shows the command that runs when a player joins
+      default: true
+softdepend: [Multiverse-Core]

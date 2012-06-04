@@ -67,6 +67,7 @@ public class CommandPlayerListener implements Listener{
             event.getPlayer().sendMessage("Command set to block");
             plugin.getBlockCommandMap().put(event.getClickedBlock().getLocation(), plugin.getBlockCommand());
             plugin.setPlaceBlock(false);
+            event.getPlayer().sendMessage(event.getClickedBlock().getLocation().toString());
          }
       }
       else{
@@ -109,7 +110,14 @@ public class CommandPlayerListener implements Listener{
    
    @EventHandler
    public void onPlayerJoin(PlayerJoinEvent event){
+      String command;
+      
       plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
+      
+      if(plugin.getPlayerJoinCommand().compareTo("chuckTesta") != 0){
+         command = plugin.getCommandMap().get(plugin.getPlayerJoinCommand()).replace("potato", event.getPlayer().getName());
+         plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      }
    }
    
    @EventHandler

@@ -81,7 +81,7 @@ private CommandMain plugin;
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
-      return false;
+      return true;
    }
 
 }

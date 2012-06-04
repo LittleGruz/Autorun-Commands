@@ -21,10 +21,14 @@ private CommandMain plugin;
             if(args.length != 0){
                String command = args[0];
                
-               if(plugin.getCommandMap().get(command) != null)
+               if(plugin.getCommandMap().get(command) != null){
                   plugin.addStartupCommand(sender, command);
-               else if(plugin.getCommandMap().get(command + "[op]") != null)
+                  sender.sendMessage("Startup command created");
+               }
+               else if(plugin.getCommandMap().get(command + "[op]") != null){
                   plugin.addStartupCommand(sender, command);
+                  sender.sendMessage("OP startup command created");
+               }
                else{
                   sender.sendMessage("No command found with that identifier");
                   sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
@@ -41,10 +45,14 @@ private CommandMain plugin;
             if(args.length != 0){
                String command = args[0];
                
-               if(plugin.getCommandMap().get(command) != null)
+               if(plugin.getCommandMap().get(command) != null){
                   plugin.removeStartupCommand(sender, command);
-               else if(plugin.getCommandMap().get(command + "[op]") != null)
+                  sender.sendMessage("Startup command removed");
+               }
+               else if(plugin.getCommandMap().get(command + "[op]") != null){
                   plugin.removeStartupCommand(sender, command + "[op]");
+                  sender.sendMessage("OP startup command removed");
+               }
                else{
                   sender.sendMessage("No command found with that identifier");
                   sender.sendMessage("Try \'/addacommand <identifier> <command> [args]\' first");
@@ -71,7 +79,7 @@ private CommandMain plugin;
             sender.sendMessage("You don't have sufficient permissions");
       }
       
-      return false;
+      return true;
    }
 
 }

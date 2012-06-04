@@ -12,12 +12,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import littlegruz.autoruncommands.commands.Blocks;
 import littlegruz.autoruncommands.commands.Commands;
 import littlegruz.autoruncommands.commands.Death;
+import littlegruz.autoruncommands.commands.Join;
 import littlegruz.autoruncommands.commands.Repeat;
 import littlegruz.autoruncommands.commands.Respawn;
 import littlegruz.autoruncommands.commands.RightClick;
@@ -48,10 +48,12 @@ public class CommandMain extends JavaPlugin{
    private File respawnFile;
    private File startupFile;
    private File repeatFile;
+   private File joinFile;
    private boolean placeBlock;
    private boolean startupDone;
    private String blockCommand;
    private String startupCommands;
+   private String joinCommand;
 
    public void onDisable(){
       //Save player data
@@ -72,23 +74,23 @@ public class CommandMain extends JavaPlugin{
       
       //Save block data
       try{
-          BufferedWriter bw = new BufferedWriter(new FileWriter(blockFile));
-          Iterator<Map.Entry<Location, String>> it = blockCommandMap.entrySet().iterator();
-          
-          //Save the blocks and corresponding commands
-          bw.write("<Block Location> <Command>\n");
-          while(it.hasNext()){
-             Entry<Location, String> mp = it.next();
-             bw.write(mp.getKey().getWorld().getUID().toString() + " "
-                     + Double.toString(mp.getKey().getX()) + " "
-                     + Double.toString(mp.getKey().getY()) + " "
-                     + Double.toString(mp.getKey().getZ()) + " "
-                     + mp.getValue() + "\n");
-          }
-          bw.close();
-       }catch(IOException e){
-          log.info("Error saving block command file");
-       }
+         BufferedWriter bw = new BufferedWriter(new FileWriter(blockFile));
+         Iterator<Map.Entry<Location, String>> it = blockCommandMap.entrySet().iterator();
+         
+         //Save the blocks and corresponding commands
+         bw.write("<Block Location> <Command>\n");
+         while(it.hasNext()){
+            Entry<Location, String> mp = it.next();
+            bw.write(mp.getKey().getWorld().getName() + " "
+                    + Double.toString(mp.getKey().getX()) + " "
+                    + Double.toString(mp.getKey().getY()) + " "
+                    + Double.toString(mp.getKey().getZ()) + " "
+                    + mp.getValue() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving block command file");
+      }
       
       //Save player death data
       try{
@@ -120,6 +122,18 @@ public class CommandMain extends JavaPlugin{
          bw.close();
       }catch(IOException e){
          log.info("Error saving player respawn command file");
+      }
+      
+      //Save player join data
+      try{
+         BufferedWriter bw = new BufferedWriter(new FileWriter(joinFile));
+         
+         bw.write("<Command>\n");
+         bw.write(joinCommand);
+         
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving player join command file");
       }
       
       //Save server start up data
@@ -179,6 +193,7 @@ public class CommandMain extends JavaPlugin{
       respawnFile = new File(getDataFolder().toString() + "/respawnList.txt");
       startupFile = new File(getDataFolder().toString() + "/startupCommands.txt");
       repeatFile = new File(getDataFolder().toString() + "/repeatList.txt");
+      joinFile = new File(getDataFolder().toString() + "/joinList.txt");
       
       //Load the player file data
       playerCommandMap = new HashMap<String, String>();
@@ -188,6 +203,7 @@ public class CommandMain extends JavaPlugin{
          String input;
          String name;
          String command;
+         
          while((input = br.readLine()) != null){
             if(input.compareToIgnoreCase("<Player> <Command>") == 0){
                continue;
@@ -220,7 +236,7 @@ public class CommandMain extends JavaPlugin{
                continue;
             }
             st = new StringTokenizer(input, " ");
-            loc = new Location(getServer().getWorld(UUID.fromString(st.nextToken())), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
+            loc = new Location(getServer().getWorld(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()), Double.parseDouble(st.nextToken()));
             command = st.nextToken();
             blockCommandMap.put(loc, command);
          }
@@ -241,6 +257,7 @@ public class CommandMain extends JavaPlugin{
          String input;
          String name;
          String command;
+         
          while((input = br.readLine()) != null){
             if(input.compareToIgnoreCase("<Player> <Command>") == 0){
                continue;
@@ -267,6 +284,7 @@ public class CommandMain extends JavaPlugin{
          String input;
          String name;
          String command;
+         
          while((input = br.readLine()) != null){
             if(input.compareToIgnoreCase("<Player> <Command>") == 0){
                continue;
@@ -283,6 +301,27 @@ public class CommandMain extends JavaPlugin{
          log.info("Error reading player respawn command file");
       }catch(Exception e){
          log.info("Incorrectly formatted player respawn command file");
+      }
+      
+      //Load the player join file data
+      try{
+         BufferedReader br = new BufferedReader(new FileReader(joinFile));
+         String input;
+         joinCommand = "chuckTesta";
+         
+         while((input = br.readLine()) != null){
+            if(input.compareToIgnoreCase("<Command>") == 0){
+               continue;
+            }
+            joinCommand = input;
+         }
+         
+      }catch(FileNotFoundException e){
+         log.info("No original player join command file, creating new one.");
+      }catch(IOException e){
+         log.info("Error reading player join command file");
+      }catch(Exception e){
+         log.info("Incorrectly formatted player join command file");
       }
       
       //Load the start up data
@@ -386,6 +425,10 @@ public class CommandMain extends JavaPlugin{
       getCommand("addrepeatcommand").setExecutor(new Repeat(this));
       getCommand("removerepeatcommand").setExecutor(new Repeat(this));
 
+      getCommand("setjoincommand").setExecutor(new Join(this));
+      getCommand("removejoincommand").setExecutor(new Join(this));
+      getCommand("displayjoincommand").setExecutor(new Join(this));
+
       getCommand("addstartupcommand").setExecutor(new Startup(this));
       getCommand("removestartupcommand").setExecutor(new Startup(this));
       getCommand("displaystartupcommands").setExecutor(new Startup(this));
@@ -485,5 +528,13 @@ public class CommandMain extends JavaPlugin{
 
    public void setStartupDone(boolean startupDone) {
       this.startupDone = startupDone;
+   }
+
+   public String getPlayerJoinCommand() {
+      return joinCommand;
+   }
+
+   public void setPlayerJoinCommand(String jc) {
+      joinCommand = jc;
    }
 }

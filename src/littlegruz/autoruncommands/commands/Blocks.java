@@ -39,7 +39,7 @@ private CommandMain plugin;
          }
       }
 
-      return false;
+      return true;
    }
 
 }
