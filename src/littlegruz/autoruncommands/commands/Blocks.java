@@ -1,7 +1,12 @@
 package littlegruz.autoruncommands.commands;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import littlegruz.autoruncommands.CommandMain;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,6 +41,16 @@ private CommandMain plugin;
             }
             else
                sender.sendMessage("No autorun command given");
+         }
+      }
+      else if(commandLabel.compareToIgnoreCase("displaycommandblocks") == 0){
+         if(sender.hasPermission("autoruncommands.displayblocks")){
+            sender.sendMessage("Location (world_name,x,y,z | Identifier");
+            Iterator<Map.Entry<Location, String>> it = plugin.getBlockCommandMap().entrySet().iterator();
+            while(it.hasNext()){
+               Entry<Location, String> mp = it.next();
+               sender.sendMessage(mp.getKey().getWorld().getName() + "," + mp.getKey().getBlockX() + "," + mp.getKey().getBlockY() + "," + mp.getKey().getBlockZ() + " | " + mp.getValue());
+            }
          }
       }
 

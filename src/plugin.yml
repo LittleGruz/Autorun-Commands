@@ -20,6 +20,9 @@ commands:
    setcommandblock:
       description: The next block right clicked will be a command block
       usage: /setcommandblock <identifier>
+   displaycommandblocks:
+      description: Lists the locations and identifiers of all command blocks
+      usage: /displaycommandblocks
    addacommand:
       description: Add a command to into the map of commands
       usage: /addacommand <identifier> <command> [args]

@@ -438,6 +438,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("displayrespawncommand").setExecutor(new Respawn(this));
 
       getCommand("setcommandblock").setExecutor(new Blocks(this));
+      getCommand("displaycommandblocks").setExecutor(new Blocks(this));
       
       getCommand("addacommand").setExecutor(new Commands(this));
       getCommand("addopcommand").setExecutor(new Commands(this));
