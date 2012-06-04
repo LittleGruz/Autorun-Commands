@@ -26,6 +26,9 @@ commands:
    addacommand:
       description: Add a command to into the map of commands
       usage: /addacommand <identifier> <command> [args]
+   displaycommands:
+      description: Lists all of the commands with their identifier
+      usage: /displaycommands
    addopcommand:
       description: Add an op command to into the map of commands
       usage: /addopcommand <identifier> <command> [args]

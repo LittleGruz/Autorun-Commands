@@ -67,7 +67,6 @@ public class CommandPlayerListener implements Listener{
             event.getPlayer().sendMessage("Command set to block");
             plugin.getBlockCommandMap().put(event.getClickedBlock().getLocation(), plugin.getBlockCommand());
             plugin.setPlaceBlock(false);
-            event.getPlayer().sendMessage(event.getClickedBlock().getLocation().toString());
          }
       }
       else{

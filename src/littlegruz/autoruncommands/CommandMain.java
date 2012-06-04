@@ -443,6 +443,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("addacommand").setExecutor(new Commands(this));
       getCommand("addopcommand").setExecutor(new Commands(this));
       getCommand("removeacommand").setExecutor(new Commands(this));
+      getCommand("displaycommands").setExecutor(new Commands(this));
       
       log.info("Autorun Commands v2.7.2 is enabled");
    }

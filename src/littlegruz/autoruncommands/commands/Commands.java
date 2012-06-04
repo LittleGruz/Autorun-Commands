@@ -130,7 +130,17 @@ private CommandMain plugin;
          }
          else
             sender.sendMessage("You don't have sufficient permissions");
-      } 
+      }
+      else if(commandLabel.compareToIgnoreCase("displaycommands") == 0){
+         if(sender.hasPermission("autoruncommands.displaycommands")){
+            sender.sendMessage("Identifier | Command");
+            Iterator<Map.Entry<String, String>> it = plugin.getCommandMap().entrySet().iterator();
+            while(it.hasNext()){
+               Entry<String, String> mp = it.next();
+               sender.sendMessage(mp.getKey() + " | /" + mp.getValue());
+            }
+         }
+      }
       return true;
    }
 

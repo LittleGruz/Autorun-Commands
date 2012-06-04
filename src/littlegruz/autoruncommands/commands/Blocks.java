@@ -45,11 +45,11 @@ private CommandMain plugin;
       }
       else if(commandLabel.compareToIgnoreCase("displaycommandblocks") == 0){
          if(sender.hasPermission("autoruncommands.displayblocks")){
-            sender.sendMessage("Location (world_name,x,y,z | Identifier");
+            sender.sendMessage("Identifier | Location (world_name,x,y,z)");
             Iterator<Map.Entry<Location, String>> it = plugin.getBlockCommandMap().entrySet().iterator();
             while(it.hasNext()){
                Entry<Location, String> mp = it.next();
-               sender.sendMessage(mp.getKey().getWorld().getName() + "," + mp.getKey().getBlockX() + "," + mp.getKey().getBlockY() + "," + mp.getKey().getBlockZ() + " | " + mp.getValue());
+               sender.sendMessage(mp.getValue() + " | " + mp.getKey().getWorld().getName() + "," + mp.getKey().getBlockX() + "," + mp.getKey().getBlockY() + "," + mp.getKey().getBlockZ());
             }
          }
       }
