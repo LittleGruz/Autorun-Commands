@@ -1,7 +1,10 @@
 package littlegruz.autoruncommands.commands;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import littlegruz.autoruncommands.CommandMain;
 
@@ -77,7 +80,7 @@ private CommandMain plugin;
                
                if(plugin.getRunningRepeatMap().get(command) != null){
                   st = new StringTokenizer(plugin.getRunningRepeatMap().get(command), "|");
-                  plugin.getServer().getScheduler().cancelTask(Integer.getInteger(st.nextToken()));
+                  plugin.getServer().getScheduler().cancelTask(Integer.parseInt(st.nextToken()));
                   plugin.getRunningRepeatMap().remove(command);
                   plugin.getRepeatMap().remove(command);
                   sender.sendMessage("That command has now stopped repeating");
@@ -100,8 +103,16 @@ private CommandMain plugin;
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
-      
+      else if(commandLabel.compareToIgnoreCase("displayrepeatcommands") == 0){
+         if(sender.hasPermission("autoruncommands.displayrepeat")){
+            sender.sendMessage("Identifier | Repeating interval (seconds)");
+            Iterator<Map.Entry<String, Integer>> it = plugin.getRepeatCommandMap().entrySet().iterator();
+            while(it.hasNext()){
+               Entry<String, Integer> mp = it.next();
+               sender.sendMessage(mp.getKey() + " | " + mp.getValue());
+            }
+         }
+      }
       return true;
    }
-
 }

@@ -62,6 +62,9 @@ commands:
    removerepeatcommand:
       description: Remove a command from running at server start up
       usage: /removerepeatcommand <identifier>
+   displayrepeatcommands:
+      description: Remove a command from running at server start up
+      usage: /displayrepeatcommands
    setjoincommand:
       description: Add a command to run when a player joins
       usage: /setjoincommand <identifier>

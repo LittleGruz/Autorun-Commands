@@ -158,7 +158,6 @@ public class CommandMain extends JavaPlugin{
          StringTokenizer st;
          long time, prevTime;
          
-         //Save the players and corresponding commands
          bw.write("<Command> <Remainder>\n");
          while(it.hasNext()){
             Entry<String, String> mp = it.next();
@@ -166,7 +165,7 @@ public class CommandMain extends JavaPlugin{
             time = new Date().getTime();
             
             /* Skip over the first token because it is the second one that is desired */
-            st.nextToken();
+            log.info(st.nextToken());
             prevTime = Long.parseLong(st.nextToken());
             
             time /= 1000;
@@ -454,6 +453,7 @@ public class CommandMain extends JavaPlugin{
 
       getCommand("addrepeatcommand").setExecutor(new Repeat(this));
       getCommand("removerepeatcommand").setExecutor(new Repeat(this));
+      getCommand("displayrepeatcommands").setExecutor(new Repeat(this));
 
       getCommand("setjoincommand").setExecutor(new Join(this));
       getCommand("removejoincommand").setExecutor(new Join(this));
@@ -572,5 +572,9 @@ public class CommandMain extends JavaPlugin{
 
    public File getRemainderFile(){
       return remainderFile;
+   }
+
+   public HashMap<String, Integer> getRepeatCommandMap(){
+      return repeatCommandMap;
    }
 }

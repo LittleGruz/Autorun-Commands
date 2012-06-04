@@ -89,6 +89,6 @@ public class CommandServerListener implements Listener {
                }
             }
          }
-     }, 30L);
+     }, 20L);
    }
 }
