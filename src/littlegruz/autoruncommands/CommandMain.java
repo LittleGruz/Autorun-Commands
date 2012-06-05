@@ -210,7 +210,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v3.0 disabled");
+      log.info("Autorun Commands v3.0.1 disabled");
    }
 
    public void onEnable(){
@@ -338,7 +338,6 @@ public class CommandMain extends JavaPlugin{
       try{
          BufferedReader br = new BufferedReader(new FileReader(joinFile));
          String input;
-         joinCommand = "chuckTesta";
          
          while((input = br.readLine()) != null){
             if(input.compareToIgnoreCase("<Command>") == 0){
@@ -354,6 +353,8 @@ public class CommandMain extends JavaPlugin{
       }catch(Exception e){
          log.info("Incorrectly formatted player join command file");
       }
+      if(joinCommand == null)
+         joinCommand = "chuckTesta";
       
       //Load the start up data
       startupCommands = "";
@@ -475,7 +476,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("removeacommand").setExecutor(new Commands(this));
       getCommand("displaycommands").setExecutor(new Commands(this));
       
-      log.info("Autorun Commands v3.0 is enabled");
+      log.info("Autorun Commands v3.0.1 is enabled");
    }
    
    public void removeStartupCommand(CommandSender sender, String command){

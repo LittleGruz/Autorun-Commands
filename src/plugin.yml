@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 3.0
+version: 3.0.1
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -66,7 +66,7 @@ commands:
       description: Remove a command from running at server start up
       usage: /displayrepeatcommands
    setjoincommand:
-      description: Add a command to run when a player joins
+      description: Set a command to run when a player joins
       usage: /setjoincommand <identifier>
    removejoincommand:
       description: Remove a command from running when a player joins
