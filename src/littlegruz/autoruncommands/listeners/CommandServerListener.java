@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -25,9 +26,9 @@ public class CommandServerListener implements Listener {
    @EventHandler
    public void onPluginEnable(PluginEnableEvent event){
       // Run the startup tasks one second after everything has loaded
-      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 
-         public void run() {
+         public void run(){
             StringTokenizer st = new StringTokenizer(plugin.getStartupCommands(), ":");
             if(!plugin.isStartupDone()){
                while(st.countTokens() > 0)
@@ -35,16 +36,17 @@ public class CommandServerListener implements Listener {
                plugin.setStartupDone(true);
             }
          }
-     }, 20L);
+      }, 20L);
       
       /* Start the repeating tasks one and a half seconds after everything has
        * loaded.
        * I heard you like scheduled tasks, so I put a scheduled task in your
        * scheduled task */
-      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-         public void run() {
+      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+         
+         public void run(){
             int id, interval;
+            HashMap<String, Integer> remainderMap = new HashMap<String, Integer>();
             Iterator<Map.Entry<String, Integer>> it = plugin.getRepeatMap().entrySet().iterator();
             
             // Attach the remainder times onto the tasks that need to repeat
@@ -58,7 +60,7 @@ public class CommandServerListener implements Listener {
                      continue;
                   }
                   st = new StringTokenizer(input, " ");
-                  plugin.getRunningRepeatMap().put(st.nextToken(), st.nextToken());
+                  remainderMap.put(st.nextToken(), Integer.parseInt(st.nextToken()));
                }
                
             }catch(FileNotFoundException e){
@@ -76,19 +78,22 @@ public class CommandServerListener implements Listener {
                
                interval = mp.getValue();
                
-               if(plugin.getCommandMap().get(command) != null
-                     || plugin.getCommandMap().get(command + "[op]") != null){
-                  id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin,  new Runnable() {
+               if((plugin.getCommandMap().get(command) != null
+                     || plugin.getCommandMap().get(command + "[op]") != null)
+                     && plugin.getRunningRepeatMap().get(command) == null){
+                  id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
 
                      public void run() {
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
                      }
-                  }, Integer.parseInt(plugin.getRunningRepeatMap().get(command)) * 20, interval * 20);
+                  }, remainderMap.get(command) * 20, interval * 20);
                   
+                  // This sets the "starting" time to be what it would be if the server was running
+                  time = time - (interval - remainderMap.get(command));
                   plugin.getRunningRepeatMap().put(command, Integer.toString(id) + "|" + Long.toString(time));
                }
             }
          }
-     }, 20L);
+      }, 30L);
    }
 }

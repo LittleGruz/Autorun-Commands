@@ -165,7 +165,7 @@ public class CommandMain extends JavaPlugin{
             time = new Date().getTime();
             
             /* Skip over the first token because it is the second one that is desired */
-            log.info(st.nextToken());
+            st.nextToken();
             prevTime = Long.parseLong(st.nextToken());
             
             time /= 1000;
@@ -210,7 +210,7 @@ public class CommandMain extends JavaPlugin{
        }catch(IOException e){
           log.info("Error saving command file");
        }
-      log.info("Autorun Commands v3.0.1 disabled");
+      log.info(this.toString() + " disabled");
    }
 
    public void onEnable(){
@@ -476,7 +476,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("removeacommand").setExecutor(new Commands(this));
       getCommand("displaycommands").setExecutor(new Commands(this));
       
-      log.info("Autorun Commands v3.0.1 is enabled");
+      log.info(this.toString() + " enabled");
    }
    
    public void removeStartupCommand(CommandSender sender, String command){
