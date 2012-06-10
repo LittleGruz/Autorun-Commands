@@ -126,18 +126,26 @@ public class CommandPlayerListener implements Listener{
    
    @EventHandler
    public void onPlayerRespawn(PlayerRespawnEvent event){
-      String command;
+      final String command, playerName;
+      
+      playerName = event.getPlayer().getName();
       
       if(plugin.getPlayerRespawnMap().get("GLOBAL") != null){
-         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get("GLOBAL")).replace("potato", event.getPlayer().getName());
+         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get("GLOBAL")).replace("potato", playerName);
          plugin.getServer().dispatchCommand(event.getPlayer(), command);
       }
-      else if(plugin.getPlayerRespawnMap().get(event.getPlayer().getName()) != null){
-         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get(event.getPlayer().getName())).replace("potato", event.getPlayer().getName());
-         if(command.contains("[op]"))
-            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
-         else
-            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      else if(plugin.getPlayerRespawnMap().get(playerName) != null){
+         command = plugin.getCommandMap().get(plugin.getPlayerRespawnMap().get(playerName)).replace("potato", playerName);
+         
+         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+
+            public void run(){
+               if(command.contains("[op]"))
+                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+               else
+                  plugin.getServer().dispatchCommand(plugin.getServer().getPlayer(playerName), command);
+            }
+         }, 20L);
       }
    }
 }
