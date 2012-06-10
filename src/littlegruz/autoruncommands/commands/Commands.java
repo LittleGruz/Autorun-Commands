@@ -117,16 +117,27 @@ private CommandMain plugin;
                   for(int i = 0; i < names.size(); i++)
                      plugin.getPlayerDeathMap().remove(names.get(i));
                   names.clear();
-                  names.trimToSize();
 
                   // Remove the command from the repeating list
                   plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerepeatcommand " + rmCommand);
                   
                   // Remove the command from the respawn list
-                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerespawncommand " + rmCommand);
+                  it1 = plugin.getPlayerRespawnMap().entrySet().iterator();
+                  while(it1.hasNext()){
+                     Entry<String, String> mp1 = it1.next();
+                     if(mp1.getValue().compareTo(rmCommand) == 0)
+                        names.add(mp1.getKey());
+                  }
+                  for(int i = 0; i < names.size(); i++)
+                     plugin.getPlayerRespawnMap().remove(names.get(i));
+                  names.clear();
+                  names.trimToSize();
 
                   // Remove the command from the join list
-                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removejoincommand " + rmCommand);
+                  if(plugin.getPlayerJoinCommand().compareTo(rmCommand) == 0){
+                     plugin.setPlayerJoinCommand("chuckTesta");
+                     sender.sendMessage("Join command removed");
+                  }
 
                   // Remove the command from the start up list
                   plugin.setStartupCommands(plugin.getStartupCommands().replace(":" + rmCommand, ""));
