@@ -66,7 +66,7 @@ private CommandMain plugin;
             
             if(plugin.getPlayerRespawnMap().get(associate) != null){
                plugin.getPlayerRespawnMap().remove(associate);
-               sender.sendMessage("Command removed");
+               sender.sendMessage("Respawn command removed");
             }
             else
                sender.sendMessage(associate + " has no associated respawn command");

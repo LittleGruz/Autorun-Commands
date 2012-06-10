@@ -118,8 +118,19 @@ private CommandMain plugin;
                      plugin.getPlayerDeathMap().remove(names.get(i));
                   names.clear();
                   names.trimToSize();
+
+                  // Remove the command from the repeating list
+                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerepeatcommand " + rmCommand);
                   
+                  // Remove the command from the respawn list
+                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerespawncommand " + rmCommand);
+
+                  // Remove the command from the join list
+                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removejoincommand " + rmCommand);
+
+                  // Remove the command from the start up list
                   plugin.setStartupCommands(plugin.getStartupCommands().replace(":" + rmCommand, ""));
+                  
                   sender.sendMessage("Command removed");
                }
                else
