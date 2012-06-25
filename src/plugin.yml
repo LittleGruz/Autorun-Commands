@@ -67,10 +67,10 @@ commands:
       usage: /displayrepeatcommands
    addjoincommand:
       description: Set a command to run when a player joins
-      usage: /setjoincommand <identifier>
+      usage: /addjoincommand <identifier>
    addfirstjoincommand:
       description: Set a command to run when a player first joins
-      usage: /setfirstjoincommand <identifier>
+      usage: /addfirstjoincommand <identifier>
    removejoincommand:
       description: Remove a command from running when a player joins
       usage: /removejoincommand <identifier>
@@ -78,9 +78,9 @@ commands:
       description: Display the command that runs when a player joins
       usage: /displayjoincommand
    reloadautorunconfig:
-      description: Display the command that runs when a player joins
+      description: Reload config file
       usage: /reloadautorunconfig
-   toggleFirstJoinCommands:
+   togglefirstjoincommands:
       description: Toggles whether or not first server join commands run
       usage: /toggleFirstJoinCommands
 permissions:
