@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import littlegruz.autoruncommands.commands.Blocks;
 import littlegruz.autoruncommands.commands.Commands;
+import littlegruz.autoruncommands.commands.Config;
 import littlegruz.autoruncommands.commands.Death;
 import littlegruz.autoruncommands.commands.Join;
 import littlegruz.autoruncommands.commands.Repeat;
@@ -42,6 +43,7 @@ public class CommandMain extends JavaPlugin{
    private HashMap<String, String> respawnCommandMap;
    private HashMap<String, Integer> repeatCommandMap;
    private HashMap<String, String> runningRepeatCommandMap;
+   private HashMap<String, String> joinCommandMap;
    private File playerFile;
    private File commandFile;
    private File blockFile;
@@ -53,9 +55,9 @@ public class CommandMain extends JavaPlugin{
    private File remainderFile;
    private boolean placeBlock;
    private boolean startupDone;
+   private boolean firstJoin;
    private String blockCommand;
    private String startupCommands;
-   private String joinCommand;
 
    public void onDisable(){
       //Save player data
@@ -129,9 +131,14 @@ public class CommandMain extends JavaPlugin{
       //Save player join data
       try{
          BufferedWriter bw = new BufferedWriter(new FileWriter(joinFile));
-         
-         bw.write("<Command>\n");
-         bw.write(joinCommand);
+         Iterator<Map.Entry<String, String>> it = joinCommandMap.entrySet().iterator();
+
+         //Save the join and first join commands
+         bw.write("<Command> <Join>\n");
+         while(it.hasNext()){
+            Entry<String, String> mp = it.next();
+            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+         }
          
          bw.close();
       }catch(IOException e){
@@ -197,19 +204,22 @@ public class CommandMain extends JavaPlugin{
       
       //Save command data
       try{
-          BufferedWriter bw = new BufferedWriter(new FileWriter(commandFile));
-          Iterator<Map.Entry<String, String>> it = commandMap.entrySet().iterator();
-          
-          //Save the blocks and corresponding commands
-          bw.write("<Identifing name> <Command>\n");
-          while(it.hasNext()){
-             Entry<String, String> mp = it.next();
-             bw.write(mp.getKey() + " " + mp.getValue() + "\n");
-          }
-          bw.close();
-       }catch(IOException e){
-          log.info("Error saving command file");
-       }
+         BufferedWriter bw = new BufferedWriter(new FileWriter(commandFile));
+         Iterator<Map.Entry<String, String>> it = commandMap.entrySet().iterator();
+         
+         //Save the blocks and corresponding commands
+         bw.write("<Identifing name> <Command>\n");
+         while(it.hasNext()){
+            Entry<String, String> mp = it.next();
+            bw.write(mp.getKey() + " " + mp.getValue() + "\n");
+         }
+         bw.close();
+      }catch(IOException e){
+         log.info("Error saving command file");
+      }
+
+      saveConfig();
+      
       log.info(this.toString() + " disabled");
    }
 
@@ -335,15 +345,18 @@ public class CommandMain extends JavaPlugin{
       }
       
       //Load the player join file data
+      joinCommandMap = new HashMap<String, String>();
       try{
          BufferedReader br = new BufferedReader(new FileReader(joinFile));
+         StringTokenizer st;
          String input;
          
          while((input = br.readLine()) != null){
-            if(input.compareToIgnoreCase("<Command>") == 0){
+            if(input.compareToIgnoreCase("<Command> <Join>") == 0){
                continue;
             }
-            joinCommand = input;
+            st = new StringTokenizer(input, " ");
+            joinCommandMap.put(st.nextToken(), st.nextToken());
          }
          
       }catch(FileNotFoundException e){
@@ -353,8 +366,6 @@ public class CommandMain extends JavaPlugin{
       }catch(Exception e){
          log.info("Incorrectly formatted player join command file");
       }
-      if(joinCommand == null)
-         joinCommand = "chuckTesta";
       
       //Load the start up data
       startupCommands = "";
@@ -437,6 +448,12 @@ public class CommandMain extends JavaPlugin{
       playerPosMap = new HashMap<String, Location>();
       runningRepeatCommandMap = new HashMap<String, String>();
       
+      // Pulling data from config.yml
+      if(getConfig().isBoolean("first_join"))
+         firstJoin = getConfig().getBoolean("first_join");
+      else
+         firstJoin = true;
+      
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
       getServer().getPluginManager().registerEvents(new CommandBlockListener(this), this);
@@ -456,9 +473,10 @@ public class CommandMain extends JavaPlugin{
       getCommand("removerepeatcommand").setExecutor(new Repeat(this));
       getCommand("displayrepeatcommands").setExecutor(new Repeat(this));
 
-      getCommand("setjoincommand").setExecutor(new Join(this));
+      getCommand("addjoincommand").setExecutor(new Join(this));
+      getCommand("addfirstjoincommand").setExecutor(new Join(this));
       getCommand("removejoincommand").setExecutor(new Join(this));
-      getCommand("displayjoincommand").setExecutor(new Join(this));
+      getCommand("displayjoincommands").setExecutor(new Join(this));
 
       getCommand("addstartupcommand").setExecutor(new Startup(this));
       getCommand("removestartupcommand").setExecutor(new Startup(this));
@@ -475,6 +493,9 @@ public class CommandMain extends JavaPlugin{
       getCommand("addopcommand").setExecutor(new Commands(this));
       getCommand("removeacommand").setExecutor(new Commands(this));
       getCommand("displaycommands").setExecutor(new Commands(this));
+      
+      getCommand("reloadautorunconfig").setExecutor(new Config(this));
+      getCommand("toggleFirstJoinCommands").setExecutor(new Config(this));
       
       log.info(this.toString() + " enabled");
    }
@@ -563,12 +584,8 @@ public class CommandMain extends JavaPlugin{
       this.startupDone = startupDone;
    }
 
-   public String getPlayerJoinCommand() {
-      return joinCommand;
-   }
-
-   public void setPlayerJoinCommand(String jc) {
-      joinCommand = jc;
+   public HashMap<String, String> getPlayerJoinMap() {
+      return joinCommandMap;
    }
 
    public File getRemainderFile(){
@@ -577,5 +594,13 @@ public class CommandMain extends JavaPlugin{
 
    public HashMap<String, Integer> getRepeatCommandMap(){
       return repeatCommandMap;
+   }
+
+   public void setFirstJoin(boolean firstJoin){
+      this.firstJoin = firstJoin;
+   }
+
+   public boolean isFirstJoin(){
+      return firstJoin;
    }
 }

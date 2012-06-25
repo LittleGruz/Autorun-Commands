@@ -13,7 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class Commands implements CommandExecutor{
-private CommandMain plugin;
+   private CommandMain plugin;
    
    public Commands(CommandMain instance){
       plugin = instance;
@@ -131,13 +131,19 @@ private CommandMain plugin;
                   for(int i = 0; i < names.size(); i++)
                      plugin.getPlayerRespawnMap().remove(names.get(i));
                   names.clear();
-                  names.trimToSize();
 
                   // Remove the command from the join list
-                  if(plugin.getPlayerJoinCommand().compareTo(rmCommand) == 0){
-                     plugin.setPlayerJoinCommand("chuckTesta");
-                     sender.sendMessage("Join command removed");
+                  it1 = plugin.getPlayerJoinMap().entrySet().iterator();
+                  while(it1.hasNext()){
+                     Entry<String, String> mp1 = it1.next();
+                     if(mp1.getValue().compareTo(rmCommand) == 0)
+                        names.add(mp1.getKey());
                   }
+                  for(int i = 0; i < names.size(); i++)
+                     plugin.getPlayerRespawnMap().remove(names.get(i));
+                  names.clear();
+                  
+                  names.trimToSize();
 
                   // Remove the command from the start up list
                   plugin.setStartupCommands(plugin.getStartupCommands().replace(":" + rmCommand, ""));

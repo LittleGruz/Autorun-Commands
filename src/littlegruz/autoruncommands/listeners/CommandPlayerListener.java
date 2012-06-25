@@ -1,5 +1,9 @@
 package littlegruz.autoruncommands.listeners;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import littlegruz.autoruncommands.CommandMain;
 
 import org.bukkit.Location;
@@ -110,12 +114,25 @@ public class CommandPlayerListener implements Listener{
    @EventHandler
    public void onPlayerJoin(PlayerJoinEvent event){
       String command;
+      Iterator<Map.Entry<String, String>> it = plugin.getPlayerJoinMap().entrySet().iterator();
       
       plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
       
-      if(plugin.getPlayerJoinCommand().compareTo("chuckTesta") != 0){
-         command = plugin.getCommandMap().get(plugin.getPlayerJoinCommand()).replace("potato", event.getPlayer().getName());
-         plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      if(plugin.isFirstJoin()){
+         while(it.hasNext()){
+            Entry<String, String> join = it.next();
+            command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
+            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+         }
+      }
+      else{
+         while(it.hasNext()){
+            Entry<String, String> join = it.next();
+            if(join.getValue().compareToIgnoreCase("normal") == 0){
+               command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
+               plugin.getServer().dispatchCommand(event.getPlayer(), command);
+            }
+         }
       }
    }
    
