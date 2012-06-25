@@ -115,16 +115,26 @@ public class CommandPlayerListener implements Listener{
    public void onPlayerJoin(PlayerJoinEvent event){
       String command;
       Iterator<Map.Entry<String, String>> it = plugin.getPlayerJoinMap().entrySet().iterator();
-      
       plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
       
+      // Check if the first server join commands are enabled
       if(plugin.isFirstJoin()){
          while(it.hasNext()){
             Entry<String, String> join = it.next();
-            command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
-            plugin.getServer().dispatchCommand(event.getPlayer(), command);
+            // Run first joins commands if first join and such commands exist
+            if(join.getValue().compareToIgnoreCase("first") == 0){
+               if(event.getPlayer().getLastPlayed() == 0){
+                  command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
+                  plugin.getServer().dispatchCommand(event.getPlayer(), command);
+               }
+            }
+            else{
+               command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
+               plugin.getServer().dispatchCommand(event.getPlayer(), command);
+            }
          }
       }
+      // Just run the normal join commands
       else{
          while(it.hasNext()){
             Entry<String, String> join = it.next();
