@@ -1,6 +1,6 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 3.1
+version: 3.1.1
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -98,3 +98,4 @@ permissions:
       default: true
 softdepend: [Multiverse-Core]
 softdepend: [My Worlds]
+softdepend: [MultiWorld]
