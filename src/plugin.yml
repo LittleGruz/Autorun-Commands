@@ -1,6 +1,8 @@
 name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
-version: 3.1.1
+author: LittleGruz
+website: http://www.littlegruz.com
+version: 3.1.2
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -96,6 +98,4 @@ permissions:
    autoruncommands.displayjoin:
       description: Shows the command that runs when a player joins
       default: true
-softdepend: [Multiverse-Core]
-softdepend: [My Worlds]
-softdepend: [MultiWorld]
+softdepend: [Multiverse-Core, My Worlds, MultiWorld]
