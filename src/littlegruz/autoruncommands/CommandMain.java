@@ -58,6 +58,7 @@ public class CommandMain extends JavaPlugin{
    private boolean firstJoin;
    private String blockCommand;
    private String startupCommands;
+   private int joinDelay;
 
    public void onDisable(){
       //Save player data
@@ -453,6 +454,10 @@ public class CommandMain extends JavaPlugin{
          firstJoin = getConfig().getBoolean("first_join");
       else
          firstJoin = true;
+      if(getConfig().isInt("join_delay"))
+         joinDelay = getConfig().getInt("join_delay");
+      else
+         joinDelay = 0;
       
       //Set up the listeners
       getServer().getPluginManager().registerEvents(new CommandPlayerListener(this), this);
@@ -477,6 +482,7 @@ public class CommandMain extends JavaPlugin{
       getCommand("addfirstjoincommand").setExecutor(new Join(this));
       getCommand("removejoincommand").setExecutor(new Join(this));
       getCommand("displayjoincommands").setExecutor(new Join(this));
+      getCommand("setjoincommanddelay").setExecutor(new Join(this));
 
       getCommand("addstartupcommand").setExecutor(new Startup(this));
       getCommand("removestartupcommand").setExecutor(new Startup(this));
@@ -602,5 +608,13 @@ public class CommandMain extends JavaPlugin{
 
    public boolean isFirstJoin(){
       return firstJoin;
+   }
+
+   public void setJoinDelay(int joinDelay){
+      this.joinDelay = joinDelay;
+   }
+
+   public int getJoinDelay(){
+      return joinDelay;
    }
 }

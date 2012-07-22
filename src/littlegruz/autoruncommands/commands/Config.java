@@ -20,10 +20,12 @@ public class Config implements CommandExecutor{
             
             if(plugin.getConfig().isBoolean("first_join"))
                plugin.setFirstJoin(plugin.getConfig().getBoolean("first_join"));
+            if(plugin.getConfig().isInt("join_delay"))
+               plugin.setJoinDelay(plugin.getConfig().getInt("join_delay"));
             
             sender.sendMessage("Config reloaded");
          }
-         else if(commandLabel.compareToIgnoreCase("toggleFirstJoinCommands") == 0){
+         else if(commandLabel.compareToIgnoreCase("togglefirstjoincommands") == 0){
             if(plugin.isFirstJoin()){
                plugin.setFirstJoin(false);
                plugin.getConfig().set("first_join", false);

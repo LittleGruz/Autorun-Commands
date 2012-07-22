@@ -57,6 +57,29 @@ private CommandMain plugin;
          else
             sender.sendMessage("You don't have sufficient permissions");
       }
+      else if(commandLabel.compareToIgnoreCase("setjoincommanddelay") == 0){
+         if(sender.hasPermission("autoruncommands.addjoin")){
+            if(args.length == 1){
+               try{
+               plugin.setJoinDelay(Integer.parseInt(args[0]));
+               plugin.getConfig().set("join_delay", Integer.parseInt(args[0]));
+               
+               if(Integer.parseInt(args[0]) == 0)
+                  sender.sendMessage("Join command delay disabled");
+               else
+                  sender.sendMessage("Join command delay set to " + args[0] + " seconds");
+               }catch(NumberFormatException e){
+                  sender.sendMessage("Letters are not numbers moron...");
+               }
+               
+               plugin.saveConfig();
+            }
+            else
+               return false;
+         }
+         else
+            sender.sendMessage("You don't have sufficient permissions");
+      }
       return true;
    }
    

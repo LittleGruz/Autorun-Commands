@@ -113,37 +113,46 @@ public class CommandPlayerListener implements Listener{
    
    @EventHandler
    public void onPlayerJoin(PlayerJoinEvent event){
-      String command;
-      Iterator<Map.Entry<String, String>> it = plugin.getPlayerJoinMap().entrySet().iterator();
-      plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
+      final Player playa;
       
-      // Check if the first server join commands are enabled
-      if(plugin.isFirstJoin()){
-         while(it.hasNext()){
-            Entry<String, String> join = it.next();
-            // Run first joins commands if first join and such commands exist
-            if(join.getValue().compareToIgnoreCase("first") == 0){
-               if(event.getPlayer().getLastPlayed() == 0){
-                  command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
-                  plugin.getServer().dispatchCommand(event.getPlayer(), command);
+      plugin.getPlayerPosMap().put(event.getPlayer().getName(), null);
+      playa = event.getPlayer();
+      
+      plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+         public void run(){
+            Iterator<Map.Entry<String, String>> it = plugin.getPlayerJoinMap().entrySet().iterator();
+            String command;
+            // Check if the first server join commands are enabled
+            if(plugin.isFirstJoin()){
+               while(it.hasNext()){
+                  Entry<String, String> join = it.next();
+                  // Run first joins commands if first join and such commands exist
+                  if(join.getValue().compareToIgnoreCase("first") == 0){
+                     if(playa.getLastPlayed() == 0){
+                        command = plugin.getCommandMap().get(join.getKey()).replace("potato", playa.getName());
+                        plugin.getServer().dispatchCommand(playa, command);
+                     }
+                  }
+                  else{
+                     command = plugin.getCommandMap().get(join.getKey()).replace("potato", playa.getName());
+                     plugin.getServer().dispatchCommand(playa, command);
+                  }
                }
             }
+            // Just run the normal join commands
             else{
-               command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
-               plugin.getServer().dispatchCommand(event.getPlayer(), command);
+               while(it.hasNext()){
+                  Entry<String, String> join = it.next();
+                  if(join.getValue().compareToIgnoreCase("normal") == 0){
+                     command = plugin.getCommandMap().get(join.getKey()).replace("potato", playa.getName());
+                     plugin.getServer().dispatchCommand(playa, command);
+                  }
+               }
             }
          }
-      }
-      // Just run the normal join commands
-      else{
-         while(it.hasNext()){
-            Entry<String, String> join = it.next();
-            if(join.getValue().compareToIgnoreCase("normal") == 0){
-               command = plugin.getCommandMap().get(join.getKey()).replace("potato", event.getPlayer().getName());
-               plugin.getServer().dispatchCommand(event.getPlayer(), command);
-            }
-         }
-      }
+      }, plugin.getJoinDelay() * 20);
+      
+      
    }
    
    @EventHandler

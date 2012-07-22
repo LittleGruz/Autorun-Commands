@@ -84,7 +84,10 @@ commands:
       usage: /reloadautorunconfig
    togglefirstjoincommands:
       description: Toggles whether or not first server join commands run
-      usage: /toggleFirstJoinCommands
+      usage: /togglefirstjoincommands
+   setjoincommanddelay:
+      description: Sets the delay time for join commands
+      usage: /setjoincommanddelay <delay>
 permissions:
    autoruncommands.*:
       description: All the AutorunCommand commands
