@@ -29,10 +29,17 @@ public class CommandServerListener implements Listener {
       plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 
          public void run(){
+            String cmd;
             StringTokenizer st = new StringTokenizer(plugin.getStartupCommands(), ":");
+            
             if(!plugin.isStartupDone()){
-               while(st.countTokens() > 0)
-                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(st.nextToken()));
+               while(st.countTokens() > 0){
+                  cmd = st.nextToken();
+                  if(plugin.getCommandMap().get(cmd) != null)
+                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(cmd));
+                  else
+                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(cmd + "[op]"));
+               }
                plugin.setStartupDone(true);
             }
          }
