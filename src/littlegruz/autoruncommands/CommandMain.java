@@ -256,6 +256,8 @@ public class CommandMain extends JavaPlugin{
             playerCommandMap.put(name, command);
          }
          
+         br.close();
+         
       }catch(FileNotFoundException e){
          log.info("No original player command file, creating new one.");
       }catch(IOException e){
@@ -282,6 +284,8 @@ public class CommandMain extends JavaPlugin{
             command = st.nextToken();
             blockCommandMap.put(loc, command);
          }
+         
+         br.close();
          
       }catch(FileNotFoundException e){
          log.info("No original block command file, creating new one.");
@@ -310,6 +314,8 @@ public class CommandMain extends JavaPlugin{
             deathCommandMap.put(name, command);
          }
          
+         br.close();
+         
       }catch(FileNotFoundException e){
          log.info("No original player death command file, creating new one.");
       }catch(IOException e){
@@ -337,6 +343,8 @@ public class CommandMain extends JavaPlugin{
             respawnCommandMap.put(name, command);
          }
          
+         br.close();
+         
       }catch(FileNotFoundException e){
          log.info("No original player respawn command file, creating new one.");
       }catch(IOException e){
@@ -360,6 +368,8 @@ public class CommandMain extends JavaPlugin{
             joinCommandMap.put(st.nextToken(), st.nextToken());
          }
          
+         br.close();
+         
       }catch(FileNotFoundException e){
          log.info("No original player join command file, creating new one.");
       }catch(IOException e){
@@ -379,6 +389,8 @@ public class CommandMain extends JavaPlugin{
             }
             startupCommands += ":" + input;
          }
+         
+         br.close();
          
       }catch(FileNotFoundException e){
          log.info("No original start up command file, creating new one.");
@@ -403,6 +415,8 @@ public class CommandMain extends JavaPlugin{
             st = new StringTokenizer(input, " ");
             repeatCommandMap.put(st.nextToken(), Integer.parseInt(st.nextToken()));
          }
+         
+         br.close();
          
       }catch(FileNotFoundException e){
          log.info("No original repeat command file, creating new one.");
@@ -434,6 +448,8 @@ public class CommandMain extends JavaPlugin{
             }
             commandMap.put(name, args);
          }
+         
+         br.close();
          
       }catch(FileNotFoundException e){
          log.info("No original command file, creating new one.");

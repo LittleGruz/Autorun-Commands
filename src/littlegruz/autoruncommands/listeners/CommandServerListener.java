@@ -70,6 +70,8 @@ public class CommandServerListener implements Listener {
                   remainderMap.put(st.nextToken(), Integer.parseInt(st.nextToken()));
                }
                
+               br.close();
+               
             }catch(FileNotFoundException e){
                plugin.getServer().getLogger().info("No original repeating task remaining file, creating new one.");
             }catch(Exception e){
@@ -101,6 +103,6 @@ public class CommandServerListener implements Listener {
                }
             }
          }
-      }, 30L);
+      }, 40L);
    }
 }
