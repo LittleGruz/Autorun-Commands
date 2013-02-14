@@ -2,7 +2,7 @@ name: AutorunCommands
 main: littlegruz.autoruncommands.CommandMain
 author: LittleGruz
 website: http://www.littlegruz.com
-version: 3.2
+version: 3.2.1
 commands:
    setclickcommand:
       description: Binds a command to the player for when they right click on a player
@@ -50,22 +50,22 @@ commands:
       description: Add a command to run at server start up
       usage: /addstartupcommand <identifier>
    removestartupcommand:
-      description: Remove a command from running at server start up
+      description: Removes a command from running at server start up
       usage: /removestartupcommand <identifier>
    displaystartupcommands:
       description: Display the commands that run at server start up
       usage: /displaystartupcommands
    removeacommand:
-      description: Remove a command from the map of commands
+      description: Removes a command from the map of commands
       usage: /removeacommand <identifier>
    addrepeatcommand:
-      description: Add a command to run at server start up
+      description: Add a command to run at regular intervals
       usage: /addrepeatcommand <identifier> <time_interval>
    removerepeatcommand:
-      description: Remove a command from running at server start up
+      description: Removes a command from running at intervals
       usage: /removerepeatcommand <identifier>
    displayrepeatcommands:
-      description: Remove a command from running at server start up
+      description: Display the commands that run at intervals
       usage: /displayrepeatcommands
    addjoincommand:
       description: Set a command to run when a player joins
@@ -74,7 +74,7 @@ commands:
       description: Set a command to run when a player first joins
       usage: /addfirstjoincommand <identifier>
    removejoincommand:
-      description: Remove a command from running when a player joins
+      description: Removes a command from running when a player joins
       usage: /removejoincommand <identifier>
    displayjoincommands:
       description: Display the command that runs when a player joins

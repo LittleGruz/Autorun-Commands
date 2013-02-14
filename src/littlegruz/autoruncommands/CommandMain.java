@@ -533,12 +533,15 @@ public class CommandMain extends JavaPlugin{
       }
    }
    
-   public void addStartupCommand(CommandSender sender, String command){
-      if(startupCommands.contains(command))
-         sender.sendMessage("That command is already present");
+   public boolean addStartupCommand(CommandSender sender, String command){
+      if(startupCommands.contains(command)){
+         sender.sendMessage("That command is already in use");
+         return false;
+      }
       else{
          startupCommands += ":" + command;
          sender.sendMessage("Command association successful");
+         return true;
       }
    }
 

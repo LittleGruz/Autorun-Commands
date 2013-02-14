@@ -15,6 +15,7 @@ import littlegruz.autoruncommands.CommandMain;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 public class CommandServerListener implements Listener {
    private CommandMain plugin;
@@ -52,7 +53,8 @@ public class CommandServerListener implements Listener {
       plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
          
          public void run(){
-            int id, interval;
+            int interval;
+            BukkitTask repeatTask;
             HashMap<String, Integer> remainderMap = new HashMap<String, Integer>();
             Iterator<Map.Entry<String, Integer>> it = plugin.getRepeatMap().entrySet().iterator();
             
@@ -90,7 +92,7 @@ public class CommandServerListener implements Listener {
                if((plugin.getCommandMap().get(command) != null
                      || plugin.getCommandMap().get(command + "[op]") != null)
                      && plugin.getRunningRepeatMap().get(command) == null){
-                  id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable(){
+            	   repeatTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable(){
 
                      public void run() {
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
@@ -99,7 +101,7 @@ public class CommandServerListener implements Listener {
                   
                   // This sets the "starting" time to be what it would be if the server was running
                   time = time - (interval - remainderMap.get(command));
-                  plugin.getRunningRepeatMap().put(command, Integer.toString(id) + "|" + Long.toString(time));
+                  plugin.getRunningRepeatMap().put(command, Integer.toString(repeatTask.getTaskId()) + "|" + Long.toString(time));
                }
             }
          }

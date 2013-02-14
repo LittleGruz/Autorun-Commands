@@ -22,12 +22,12 @@ private CommandMain plugin;
                String command = args[0];
                
                if(plugin.getCommandMap().get(command) != null){
-                  plugin.addStartupCommand(sender, command);
-                  sender.sendMessage("Startup command created");
+                  if(plugin.addStartupCommand(sender, command))
+                     sender.sendMessage("Startup command created");
                }
                else if(plugin.getCommandMap().get(command + "[op]") != null){
-                  plugin.addStartupCommand(sender, command);
-                  sender.sendMessage("OP startup command created");
+                  if(plugin.addStartupCommand(sender, command))
+                     sender.sendMessage("OP startup command created");
                }
                else{
                   sender.sendMessage("No command found with that identifier");

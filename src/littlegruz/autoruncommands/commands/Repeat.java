@@ -11,6 +11,7 @@ import littlegruz.autoruncommands.CommandMain;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.scheduler.BukkitTask;
 
 public class Repeat implements CommandExecutor{
 private CommandMain plugin;
@@ -25,8 +26,9 @@ private CommandMain plugin;
             if(args.length == 2){
                try{
                   final String command;
-                  int interval, id;
+                  int interval;
                   long time = new Date().getTime();
+                  BukkitTask repeatTask;
                   time /= 1000;
                   
                   
@@ -42,11 +44,10 @@ private CommandMain plugin;
                   }
                   
                   interval = Integer.parseInt(args[1]);
-                  
                   // If the command is found and is not already repeating, add it
                   // NOTE: All commands will be run by the console
                   if(plugin.getRunningRepeatMap().get(args[0]) == null){
-                     id = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin,  new Runnable() {
+                	  repeatTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin,  new Runnable() {
 
                         public void run() {
                            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
@@ -54,7 +55,7 @@ private CommandMain plugin;
                      }, interval * 20, interval * 20);
 
                      plugin.getRepeatMap().put(command, interval);
-                     plugin.getRunningRepeatMap().put(command, Integer.toString(id) + "|" + Long.toString(time));
+                     plugin.getRunningRepeatMap().put(command, Integer.toString(repeatTask.getTaskId()) + "|" + Long.toString(time));
                      sender.sendMessage("That command will repeat every "
                            + interval + " seconds from now");
                   }
