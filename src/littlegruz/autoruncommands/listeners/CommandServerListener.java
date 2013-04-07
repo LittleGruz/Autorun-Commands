@@ -75,7 +75,7 @@ public class CommandServerListener implements Listener {
                br.close();
                
             }catch(FileNotFoundException e){
-               plugin.getServer().getLogger().info("No original repeating task remaining file, creating new one.");
+               plugin.getServer().getLogger().info("No original repeating task remaining file, a new one will be created on shutdown/restart.");
             }catch(Exception e){
                plugin.getServer().getLogger().info("Incorrectly formatted repeating task remaining file");
             }
