@@ -95,7 +95,10 @@ public class CommandServerListener implements Listener {
             	   repeatTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable(){
 
                      public void run() {
-                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
+                        if(plugin.getCommandMap().get(command) != null)
+                           plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command));
+                        else if(plugin.getCommandMap().get(command + "[op]") != null)
+                           plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), plugin.getCommandMap().get(command + "[op]"));
                      }
                   }, remainderMap.get(command) * 20, interval * 20);
                   
