@@ -101,4 +101,4 @@ permissions:
    autoruncommands.displayjoin:
       description: Shows the command that runs when a player joins
       default: true
-softdepend: [Multiverse-Core, My Worlds, MultiWorld]
+softdepend: [Multiverse-Core, My Worlds, MultiWorld, Spigot]

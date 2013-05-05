@@ -40,7 +40,7 @@ public class Commands implements CommandExecutor{
                   sender.sendMessage("Command added");
             }
             else
-               sender.sendMessage("An identifier and command must be given");
+               sender.sendMessage("An identifier and a command must be given");
          }
       }
       else if(commandLabel.compareToIgnoreCase("addopcommand") == 0){
@@ -119,7 +119,9 @@ public class Commands implements CommandExecutor{
                   names.clear();
 
                   // Remove the command from the repeating list
-                  plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerepeatcommand " + rmCommand);
+                  if(plugin.getRunningRepeatMap().get(rmCommand) != null
+                        || plugin.getRunningRepeatMap().get(rmCommand + "[op]") != null)
+                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "removerepeatcommand " + rmCommand);
                   
                   // Remove the command from the respawn list
                   it1 = plugin.getPlayerRespawnMap().entrySet().iterator();
